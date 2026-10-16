@@ -100,7 +100,7 @@ SUGGESTIONS_CHANNEL = "suggestions"
 PLATFORM_CHANNEL = "choose-platform"
 STAFF_CHAT_CHANNEL = "staff-chat"
 
-PLAY_ADDRESS = os.getenv("PLAY_ADDRESS", "104.204.217.168:25566")
+PLAY_ADDRESS = os.getenv("PLAY_ADDRESS", "play.tropicaltycoon.nl")
 STORE_URL = os.getenv("STORE_URL", "https://tropicaltycoon.tebex.store/")
 
 # Read-only for @everyone (name substring match, case-insensitive).
