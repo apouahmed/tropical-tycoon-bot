@@ -1,0 +1,8 @@
+.env
+info.inv
+info.env
+ticket_counter.json
+__pycache__/
+.local/
+.cache/
+*.pyc
