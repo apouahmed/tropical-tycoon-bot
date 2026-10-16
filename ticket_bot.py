@@ -2,7 +2,8 @@
 Tropical Tycoon Discord bot — tickets, welcome, rules and server layout (English).
 
 Admin:
-- /setupdiscord  preview or create categories/channels + permissions (confirm=True to apply)
+- /setupdiscord  reuse existing channels + apply permissions (confirm=True).
+                 create_missing=True only if you want new channels created.
 - /setupperms    lock existing info channels (read-only for members, Staff can post)
 - /panel         ticket panel
 - /postrules /postfaq  post content in the current channel
@@ -19,6 +20,7 @@ Start: DISCORD_TOKEN=... python3 ticket_bot.py
 
 import os
 import io
+import re
 import json
 import asyncio
 import datetime
@@ -116,8 +118,26 @@ LOCK_CHANNEL_NAMES = (
     "choose-platform",
 )
 
-# /setupdiscord: (category, [(channel, topic, mode), ...])
+# Logical name -> Discord name slugs to match (emoji prefixes stripped, e.g. 📜-rules → rules).
+CHANNEL_ALIASES = {
+    WELCOME_CHANNEL: ("welcome",),
+    ANNOUNCEMENTS_CHANNEL: ("announcements",),
+    RULES_CHANNEL: ("rules",),
+    FAQ_CHANNEL: ("faq",),
+    CHANGELOG_CHANNEL: ("changelog",),
+    PLATFORM_CHANNEL: ("choose-platform", "platform"),
+    GENERAL_CHANNEL: ("general",),
+    MEDIA_CHANNEL: ("media", "showcase"),
+    SUGGESTIONS_CHANNEL: ("suggestions", "feedback"),
+    SUPPORT_CHANNEL: ("support", "tickets", "help"),
+    TRANSCRIPT_CHANNEL: ("ticket-transcripts", "transcripts", "ticket-logs"),
+    STORE_CHANNEL: ("store", "shop", "tebex"),
+    STAFF_CHAT_CHANNEL: ("staff-chat", "staff"),
+}
+
+# /setupdiscord: (category label, [(logical_channel, topic, mode), ...])
 # mode: readonly | chat | staff | transcripts | platform
+# By default only matches existing channels (emoji names OK). Does not create new ones.
 DISCORD_LAYOUT = (
     ("INFO", (
         (WELCOME_CHANNEL, "Welcome to Tropical Tycoon — read the rules before you play.", "readonly"),
@@ -226,12 +246,42 @@ def banner_path():
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), BANNER_FILE)
 
 
+def channel_slug(name: str) -> str:
+    """Strip emoji/punctuation so 📜-rules and 📢--announcements → rules / announcements."""
+    s = re.sub(r"[^a-z0-9-]+", "-", name.lower())
+    return re.sub(r"-+", "-", s).strip("-")
+
+
 def find_text_channel(guild, contains):
-    return discord.utils.find(lambda c: contains in c.name.lower(), guild.text_channels)
+    needle = contains.lower()
+    return discord.utils.find(
+        lambda c: needle in c.name.lower() or needle in channel_slug(c.name),
+        guild.text_channels,
+    )
 
 
 def find_exact_channel(guild, name):
     return discord.utils.get(guild.text_channels, name=name)
+
+
+def find_layout_channel(guild, logical_name):
+    """Find an existing channel for a layout key (exact name, then alias slug match)."""
+    exact = find_exact_channel(guild, logical_name)
+    if exact is not None:
+        return exact
+    aliases = CHANNEL_ALIASES.get(logical_name, (logical_name,))
+    best = None
+    best_score = -1
+    for ch in guild.text_channels:
+        slug = channel_slug(ch.name)
+        for i, alias in enumerate(aliases):
+            if slug == alias or slug.endswith("-" + alias) or alias in slug.split("-"):
+                # Prefer exact slug / earlier alias / shorter channel name (less noise).
+                score = (100 - i) * 10 - len(slug)
+                if score > best_score:
+                    best = ch
+                    best_score = score
+    return best
 
 
 def footer(embed, guild):
@@ -281,18 +331,31 @@ async def ensure_role(guild, name, colour, hoist):
     return role, True
 
 
-async def ensure_category(guild, name):
+async def ensure_category(guild, name, create_missing=False):
     cat = discord.utils.get(guild.categories, name=name)
     if cat is not None:
         return cat, False
+    # Fuzzy: "COMMUNITY" matches "💬 | COMMUNITY"
+    cat = discord.utils.find(
+        lambda c: name.lower() in channel_slug(c.name) or name.lower() in c.name.lower(),
+        guild.categories,
+    )
+    if cat is not None:
+        return cat, False
+    if not create_missing:
+        return None, False
     cat = await guild.create_category(name, reason="setupdiscord: create category")
     return cat, True
 
 
-async def ensure_text_channel(guild, name, category, topic):
-    ch = find_exact_channel(guild, name)
+async def ensure_text_channel(guild, name, category, topic, create_missing=False):
+    ch = find_layout_channel(guild, name)
     if ch is not None:
         return ch, False
+    if not create_missing:
+        return None, False
+    if category is None:
+        category, _ = await ensure_category(guild, "INFO", create_missing=True)
     ch = await guild.create_text_channel(
         name, category=category, topic=topic, reason="setupdiscord: create channel")
     return ch, True
@@ -1234,11 +1297,18 @@ async def setupperms(interaction: discord.Interaction):
 
 @bot.tree.command(
     name="setupdiscord",
-    description="Preview or create Tropical Tycoon channels, roles and permissions (English)",
+    description="Apply roles/permissions on existing Tropical Tycoon channels (no duplicates by default)",
 )
-@app_commands.describe(confirm="False = preview only. True = create channels/roles and apply permissions.")
+@app_commands.describe(
+    confirm="False = preview matching. True = apply roles + permissions.",
+    create_missing="True = also create missing plain channels (default False = reuse yours only).",
+)
 @app_commands.default_permissions(administrator=True)
-async def setupdiscord(interaction: discord.Interaction, confirm: bool = False):
+async def setupdiscord(
+    interaction: discord.Interaction,
+    confirm: bool = False,
+    create_missing: bool = False,
+):
     await interaction.response.defer(ephemeral=True)
     guild = interaction.guild
     if guild is None:
@@ -1258,21 +1328,35 @@ async def setupdiscord(interaction: discord.Interaction, confirm: bool = False):
 
     plan_lines = [
         "**Roles:** " + ", ".join(n for n, _, _ in ROLE_SPECS),
-        "**Layout:**",
+        "**Matched against your existing channels** (emoji names OK):",
     ]
+    missing_preview = []
     for cat_name, channels in DISCORD_LAYOUT:
-        names = ", ".join(f"`#{n}`" for n, _, _ in channels)
-        plan_lines.append(f"• **{cat_name}** — {names}")
+        bits = []
+        for ch_name, _, _ in channels:
+            found = find_layout_channel(guild, ch_name)
+            if found is not None:
+                bits.append(f"{found.mention}")
+            else:
+                bits.append(f"`#{ch_name}` ❌")
+                missing_preview.append(ch_name)
+        plan_lines.append(f"• **{cat_name}** — " + ", ".join(bits))
     plan_lines.append(
-        "\n**Community chat:** #general, #media, #suggestions\n"
-        "**Platform:** #choose-platform (Java / Bedrock buttons)\n"
-        "**On join:** Member role + welcome message"
+        "\n**Aliases:** media↔showcase, suggestions↔feedback, etc.\n"
+        "**On join:** Member role + welcome in #welcome\n"
+        f"**create_missing:** `{create_missing}` "
+        "(keep False so nothing new is created)"
     )
+    if missing_preview:
+        plan_lines.append(
+            "\n**Not found** (skipped unless create_missing=True): `"
+            + "`, `".join(missing_preview) + "`"
+        )
 
     if not confirm:
         plan_lines.append(
             "\nThis was a **preview**. Run `/setupdiscord confirm:True` to apply "
-            "(creates missing categories/channels/roles and sets permissions)."
+            "(roles + permissions on matched channels only)."
         )
         await interaction.followup.send("\n".join(plan_lines), ephemeral=True)
         return
@@ -1288,26 +1372,34 @@ async def setupdiscord(interaction: discord.Interaction, confirm: bool = False):
     staff_roles = roles_named(guild, STAFF_ROLE_NAMES)
     mod_roles = roles_named(guild, MOD_PLUS_NAMES)
     created_channels = []
-    ensured = []
+    used = []
+    missing = []
+    failed = []
 
     for cat_name, channels in DISCORD_LAYOUT:
-        category, cat_new = await ensure_category(guild, cat_name)
-        if cat_new:
-            created_channels.append(f"category:{cat_name}")
-        await asyncio.sleep(0.3)
+        category = None
+        if create_missing:
+            category, cat_new = await ensure_category(guild, cat_name, create_missing=True)
+            if cat_new:
+                created_channels.append(f"category:{cat_name}")
+            await asyncio.sleep(0.3)
         for ch_name, topic, mode in channels:
-            channel, ch_new = await ensure_text_channel(guild, ch_name, category, topic)
+            channel, ch_new = await ensure_text_channel(
+                guild, ch_name, category, topic, create_missing=create_missing)
+            if channel is None:
+                missing.append(ch_name)
+                continue
             if ch_new:
                 created_channels.append(f"#{ch_name}")
             else:
-                ensured.append(f"#{ch_name}")
+                used.append(channel.mention)
             try:
                 await apply_channel_mode(channel, mode, everyone, staff_roles, mod_roles)
             except discord.Forbidden:
-                ensured.append(f"#{ch_name} (perms failed)")
+                failed.append(f"#{channel.name} (perms)")
             await asyncio.sleep(0.35)
 
-            if mode == "platform":
+            if mode == "platform" and ch_new:
                 try:
                     await channel.send(embed=platform_embed(guild), view=PlatformView())
                 except discord.HTTPException:
@@ -1318,18 +1410,28 @@ async def setupdiscord(interaction: discord.Interaction, confirm: bool = False):
                 except discord.HTTPException:
                     pass
 
+    rules_ch = find_layout_channel(guild, RULES_CHANNEL)
+    faq_ch = find_layout_channel(guild, FAQ_CHANNEL)
+    support_ch = find_layout_channel(guild, SUPPORT_CHANNEL)
     summary = [
-        "**Discord setup applied.**",
+        "**Discord setup applied** (existing channels reused).",
         f"**Roles created:** {', '.join(created_roles) if created_roles else 'none (already existed)'}",
-        f"**Channels/categories created:** {', '.join(created_channels) if created_channels else 'none'}",
-        "",
-        "**Next (run these once):**",
-        f"1. `/postrules` in #{RULES_CHANNEL}",
-        f"2. `/postfaq` in #{FAQ_CHANNEL}",
-        f"3. `/panel` in #{SUPPORT_CHANNEL}",
-        "4. Drag the bot role **above** Member / Java / Bedrock in Server Settings → Roles",
-        "5. Assign Owner/Admin/Mod/Guide to your team manually",
+        f"**Channels used:** {', '.join(used) if used else 'none'}",
+        f"**Created:** {', '.join(created_channels) if created_channels else 'none'}",
     ]
+    if missing:
+        summary.append("**Skipped (not found):** `" + "`, `".join(missing) + "`")
+    if failed:
+        summary.append("**Perms failed:** " + ", ".join(failed))
+    summary.extend([
+        "",
+        "**Next (run in those channels):**",
+        f"1. `/postrules` in {rules_ch.mention if rules_ch else '#rules'}",
+        f"2. `/postfaq` in {faq_ch.mention if faq_ch else '#faq'}",
+        f"3. `/panel` in {support_ch.mention if support_ch else '#support'}",
+        "4. Delete the plain duplicate channels the bot made earlier (#rules, #faq, …) if you still have them",
+        "5. Bot role **above** Member / Java / Bedrock; assign Owner/Admin/Mod/Guide manually",
+    ])
     await interaction.followup.send("\n".join(summary), ephemeral=True)
 
 
