@@ -32,7 +32,7 @@ def load_env():
     here = os.path.dirname(os.path.abspath(__file__))
     roots = {here, os.getcwd()}
     for root in roots:
-        for name in (".env", "info.inv"):
+        for name in (".env", "info.env", "info.inv"):
             path = os.path.join(root, name)
             if not os.path.isfile(path):
                 continue
