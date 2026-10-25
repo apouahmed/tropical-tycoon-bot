@@ -1476,6 +1476,7 @@ async def setup_hook():
     bot.add_view(PanelView())
     bot.add_view(TicketControls())
     bot.add_view(PlatformView())
+   await bot.load_extension("tt_admin")
 
 
 @bot.event
