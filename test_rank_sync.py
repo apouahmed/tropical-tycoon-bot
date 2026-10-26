@@ -42,14 +42,14 @@ class RankSyncTest(unittest.TestCase):
         self.assertIn("Guide", plan.remove)
         self.assertEqual(plan.managed_staff, "Mod")
 
-    def test_rank_rooms_split_around_captain(self) -> None:
+    def test_captain_shares_the_upper_room(self) -> None:
         rooms = {room.name: room for room in ranks.RANK_ROOMS}
+        self.assertEqual(set(rooms), {"below-captain", "above-captain"})
         self.assertEqual(rooms["below-captain"].allow, ("Islander", "Surfer"))
         self.assertNotIn("Captain", rooms["below-captain"].allow)
-        self.assertEqual(rooms["captain"].allow, ("Captain",))
-        self.assertEqual(rooms["above-captain"].allow, ("Tycoon", "Mogul"))
-        self.assertNotIn("Captain", rooms["above-captain"].allow)
+        self.assertEqual(rooms["above-captain"].allow, ("Captain", "Tycoon", "Mogul"))
         self.assertNotIn("Islander", rooms["above-captain"].allow)
+        self.assertEqual(ranks.RETIRED_RANK_CHANNELS, ("captain",))
 
     def test_failed_lookup_is_not_treated_as_no_rank(self) -> None:
         self.assertFalse(ranks.groups_response_ok("Could not find user Steve"))

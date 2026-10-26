@@ -14,10 +14,9 @@ Server owner: `/manage` plus `/lookup`, `/givekeys`, `/givexp`, `/move`, `/kick`
 On startup, and again from `/setupdiscord confirm:True`, the bot creates those five roles if they are missing, plus a **RANKS** category:
 
 - `#below-captain` — Islander and Surfer. Captain, Tycoon and Mogul cannot see it.
-- `#captain` — Captain only.
-- `#above-captain` — Tycoon and Mogul.
+- `#above-captain` — Captain, Tycoon and Mogul.
 
-Guide and above can see all three, unless they also wear a store role that is denied there (Discord deny wins).
+Guide and above can see both, unless they also wear a store role that is denied there (Discord deny wins). A leftover `#captain` inside RANKS is removed on the next startup.
 
 Every `RANK_SYNC_MINUTES` (default 10) it checks linked accounts again, including after a Tebex rank. `/ranksync` refreshes you immediately. A store rank granted from `/manage` refreshes that linked member too.
 

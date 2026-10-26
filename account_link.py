@@ -368,7 +368,7 @@ def setup(bot: discord.Client) -> None:
 
 
 async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
-    """Create store roles and the three rank channels. Safe to run again."""
+    """Create store roles and the rank channels. Safe to run again."""
     made: list[str] = []
     me = guild.me
     if me is None or not me.guild_permissions.manage_roles or not me.guild_permissions.manage_channels:
@@ -398,6 +398,16 @@ async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
         for name in ("Guide", "Mod", "Admin", "Owner")
         if (role := _role_named(guild, name)) is not None
     ]
+    live_names = {room.name for room in rank_sync.RANK_ROOMS}
+    for old in list(category.channels):
+        if (
+            isinstance(old, discord.TextChannel)
+            and old.name in rank_sync.RETIRED_RANK_CHANNELS
+            and old.name not in live_names
+        ):
+            await old.delete(reason="Captain now uses #above-captain")
+            made.append(f"removed:#{old.name}")
+            await asyncio.sleep(0.3)
     for room in rank_sync.RANK_ROOMS:
         channel = discord.utils.get(guild.text_channels, name=room.name)
         if channel is None:
@@ -409,8 +419,14 @@ async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
             )
             made.append(f"#{room.name}")
             await asyncio.sleep(0.3)
-        elif channel.category != category:
-            await channel.edit(category=category, reason="Tropical Tycoon rank channel")
+        else:
+            edits = {}
+            if channel.category != category:
+                edits["category"] = category
+            if channel.topic != room.topic:
+                edits["topic"] = room.topic
+            if edits:
+                await channel.edit(reason="Tropical Tycoon rank channel", **edits)
         await channel.set_permissions(
             everyone, view_channel=False, send_messages=False, reason="rank channel hidden"
         )
