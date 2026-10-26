@@ -1,6 +1,33 @@
 # Tropical Tycoon Discord bot
 
-Tickets, welcome, rules/FAQ, `/setupdiscord`, Java/Bedrock roles.
+Tickets, welcome, rules/FAQ, `/setupdiscord`, Java/Bedrock roles, and an owner-only Staff Control Center.
+
+## What the bot can do
+Anyone: `/rules`, `/play`, `/link`, `/unlink`, `/ranksync`.
+Staff in a ticket: `/add`, `/remove`, `/close request`.
+Admin: `/setupdiscord`, `/setupperms`, `/panel`, `/postrules`, `/postfaq`.
+Server owner: `/manage` plus `/lookup`, `/givekeys`, `/givexp`, `/move`, `/kick`, `/announce`, `/serverstatus`, `/acrecent`.
+
+## Ticket names
+Claim renames the channel to `🟡-` plus that staff member's name. Staff buttons rename it to `🟢-resolved`, `🔴-higher-up-needed`, or `🟣-bug-report`. Higher-up needed pings Mod and above. Bug report is only the rename: staff write the dev post themselves.
+
+`/close request` asks the person who opened the ticket to approve, with a wait of 1 to 168 hours. **Approve close** closes it immediately. **Keep open** cancels the timer. If they do not answer, the bot saves the transcript and deletes the channel when the time is up. The Close button still closes immediately. A restart does not forget a pending close.
+
+## Rank roles
+`/link` asks for your Minecraft name and whispers a code in-game (you must be online). Enter that code in Discord. The bot then reads your LuckPerms groups and sets one store role (Islander, Surfer, Captain, Tycoon or Mogul). Staff groups (Guide, Mod, Admin, Owner) are applied the same way. A role this bot did not assign is left in place.
+
+On startup, and again from `/setupdiscord confirm:True`, the bot creates those five roles if they are missing, plus a **RANKS** category:
+
+- `#donater` — Islander and Surfer. Captain, Tycoon and Mogul cannot see it.
+- `#donater➕` — Captain, Tycoon and Mogul. Discord does not allow a plain `+` in a channel name, so the plus is an emoji.
+
+Guide and above can see both, unless they also wear a store role that is denied there (Discord deny wins). Old `#captain`, `#below-captain` and `#above-captain` channels inside RANKS are renamed or removed on the next startup.
+
+Every `RANK_SYNC_MINUTES` (default 10) it checks linked accounts again, including after a Tebex rank. `/ranksync` refreshes you immediately. A store rank granted from `/manage` refreshes that linked member too.
+
+The bot's own role must sit above those rank roles, and it needs **Manage Roles**. RCON has to be set or `/link` cannot whisper the code.
+
+`/manage` opens modules for fishing AC, player profiles, kicks and announcements, economy grants (keys, boosters, Tycoon XP, pets, store ranks), the live events (Gen Overload, Sell Frenzy, Lucky Drops), and network status. Grants that the server can dedupe end with a Discord transaction id. Console actions need `RCON_HOST`, `RCON_PORT` and `RCON_PASSWORD`. Audits go to `STAFF_LOG_WEBHOOK` when set.
 
 ## Wispbyte
 1. Repository: this repo (private) — branch `main`
@@ -8,10 +35,10 @@ Tickets, welcome, rules/FAQ, `/setupdiscord`, Java/Bedrock roles.
 3. `PY_FILE` = `main.py`
 4. `REQUIREMENTS_FILE` = `requirements.txt`
 5. `AUTO_UPDATE` = `1`
-6. Variables: `DISCORD_TOKEN`, `DISCORD_PRIVILEGED_INTENTS=1`
+6. Variables: `DISCORD_TOKEN`, `DISCORD_PRIVILEGED_INTENTS=1`, plus `RCON_HOST`, `RCON_PORT`, `RCON_PASSWORD` if the owner tools should reach the skyblock console. Optional: `STAFF_LOG_WEBHOOK`, `AC_LOG_CHANNEL_ID`.
 7. Start → in Discord run `/setupdiscord` then `/setupdiscord confirm:True`
 
-Bot needs **Manage Channels** + **Manage Roles** (role above Member/Java/Bedrock).
+Bot needs **Manage Channels** + **Manage Roles** (its role above Member, Java, Bedrock and the rank roles).
 
 ## Local
 ```bash

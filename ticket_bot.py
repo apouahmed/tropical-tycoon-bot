@@ -1,16 +1,17 @@
 """
-Tropical Tycoon Discord bot — tickets, welcome, rules and server layout (English).
+Tropical Tycoon Discord bot — tickets, welcome, rules and staff tools (English).
 
 Admin:
 - /setupdiscord  reuse existing channels + apply permissions (confirm=True).
                  create_missing=True only if you want new channels created.
 - /setupperms    lock existing info channels (read-only for members, Staff can post)
 - /panel         ticket panel
+- /manage        Staff Control Center (owner only)
 - /postrules /postfaq  post content in the current channel
 
-Anyone:
-- /rules
-Staff (in a ticket): /add /remove
+Owner: /lookup /givekeys /givexp /move /kick /announce /serverstatus /acrecent
+Anyone: /rules /play /link /unlink /ranksync
+Staff (in a ticket): /add /remove /close request
 
 Privileged intent: Server Members + Message Content in the Developer Portal,
 then DISCORD_PRIVILEGED_INTENTS=1.
@@ -24,10 +25,15 @@ import re
 import json
 import asyncio
 import datetime
+import time
 import certifi
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+import account_link
+import staff_manage
+import ticket_status
 
 def load_env():
     """Load KEY=value from .env / info.inv (fills empty panel vars; non-empty env wins)."""
@@ -81,6 +87,11 @@ ROLE_SPECS = (
     (ADMIN_ROLE, discord.Colour.red(), True),
     (MOD_ROLE, discord.Colour.blue(), True),
     (GUIDE_ROLE, discord.Colour.teal(), True),
+    ("Mogul", discord.Colour(0xFF6F00), True),
+    ("Tycoon", discord.Colour(0x00838F), True),
+    ("Captain", discord.Colour(0x1565C0), True),
+    ("Surfer", discord.Colour(0x29B6F6), True),
+    ("Islander", discord.Colour(0xC9A227), True),
     (MEMBER_ROLE, discord.Colour.dark_grey(), False),
     (JAVA_ROLE, discord.Colour.green(), False),
     (BEDROCK_ROLE, discord.Colour.blurple(), False),
@@ -983,7 +994,7 @@ async def create_ticket(interaction, key, reason, extra=None):
         category = await guild.create_category(cat_name, overwrites=cat_overwrites)
 
     number = next_ticket_number()
-    topic = write_topic({"owner": user.id, "claimed": 0, "type": key})
+    topic = write_topic({"owner": user.id, "claimed": 0, "type": key, "n": number, "status": "open"})
     channel = await guild.create_text_channel(f"ticket-{number}", category=category,
                                               overwrites=overwrites, topic=topic)
 
@@ -1036,13 +1047,15 @@ async def send_transcript(channel, closed_by, data):
     embed.add_field(name="Messages", value=str(len(lines)), inline=True)
     embed.set_footer(text="The full conversation is in the file below.")
 
+    filename = ticket_status.transcript_filename(channel.name, str(data.get("n", "")))
+    payload = text.encode("utf-8")
     log = find_text_channel(guild, TRANSCRIPT_CHANNEL)
     if log:
-        await log.send(embed=embed, file=discord.File(io.BytesIO(text.encode("utf-8")), filename=f"{channel.name}.txt"))
+        await log.send(embed=embed, file=discord.File(io.BytesIO(payload), filename=filename))
 
     try:
         owner = await bot.fetch_user(int(data.get("owner")))
-        await owner.send(embed=embed, file=discord.File(io.BytesIO(text.encode("utf-8")), filename=f"{channel.name}.txt"))
+        await owner.send(embed=embed, file=discord.File(io.BytesIO(payload), filename=filename))
     except Exception:
         pass
 
@@ -1116,6 +1129,119 @@ class TicketModal(discord.ui.Modal):
         await create_ticket(interaction, self.key, self.reden.value, extra)
 
 
+_close_tasks: dict[int, asyncio.Task] = {}
+_closing: set[int] = set()
+
+
+def claimed_label(guild, data):
+    raw = str(data.get("claimed", "0"))
+    if raw == "0":
+        return None
+    member = guild.get_member(int(raw)) if raw.isdigit() else None
+    return member.display_name if member is not None else "staff"
+
+
+def _status_embed(message, status_text):
+    embed = message.embeds[0] if message is not None and message.embeds else None
+    if embed is None:
+        return None
+    for i, field in enumerate(embed.fields):
+        if "Status" in field.name:
+            embed.set_field_at(i, name="Status", value=status_text, inline=True)
+            return embed
+    embed.add_field(name="Status", value=status_text, inline=True)
+    return embed
+
+
+async def set_ticket_name(channel, data, name):
+    """Rename the ticket and store the topic. Returns an error string, or None."""
+    try:
+        await channel.edit(name=name, topic=write_topic(data), reason="ticket status")
+        return None
+    except discord.HTTPException as exc:
+        try:
+            await channel.edit(topic=write_topic(data), reason="ticket status")
+        except discord.HTTPException:
+            pass
+        return f"Discord did not rename the channel yet ({exc}). Try again in a few minutes."
+
+
+async def close_ticket_channel(channel, closed_by, data, notice):
+    if channel.id in _closing:
+        return
+    _closing.add(channel.id)
+    task = _close_tasks.pop(channel.id, None)
+    if task is not None and not task.done() and task is not asyncio.current_task():
+        task.cancel()
+    data.pop("close_at", None)
+    try:
+        try:
+            await channel.edit(topic=write_topic(data), reason="ticket closing")
+        except discord.HTTPException:
+            pass
+        await channel.send(embed=discord.Embed(
+            description=f"{notice} This channel will be deleted in 5 seconds.",
+            colour=0xEF4444))
+        try:
+            await send_transcript(channel, closed_by, data)
+        except Exception as exc:
+            print(f"transcript failed for {channel.id}: {exc}", flush=True)
+        await asyncio.sleep(5)
+        await channel.delete(reason=notice)
+    except Exception as exc:
+        _closing.discard(channel.id)
+        print(f"ticket close failed for {channel.id}: {exc}", flush=True)
+        raise
+
+
+def schedule_close(channel_id, guild_id, deadline):
+    old = _close_tasks.get(channel_id)
+    if old is not None and not old.done():
+        old.cancel()
+
+    async def waiter():
+        try:
+            await asyncio.sleep(ticket_status.seconds_until(deadline, time.time()))
+        except asyncio.CancelledError:
+            return
+        await fire_close(guild_id, channel_id, deadline)
+
+    _close_tasks[channel_id] = asyncio.create_task(waiter())
+
+
+async def fire_close(guild_id, channel_id, deadline):
+    channel = bot.get_channel(channel_id)
+    if not isinstance(channel, discord.TextChannel) or channel.guild.id != guild_id:
+        return
+    data = read_topic(channel)
+    if data.get("close_at") != str(deadline):
+        return
+    await close_ticket_channel(
+        channel,
+        bot.user,
+        data,
+        "Closed automatically because the close request was not answered in time.",
+    )
+
+
+def resume_close_requests():
+    if getattr(bot, "_tt_close_resume", False):
+        return
+    bot._tt_close_resume = True
+
+    async def runner():
+        await bot.wait_until_ready()
+        for guild in list(bot.guilds):
+            for channel in list(guild.text_channels):
+                if not is_ticket(channel):
+                    continue
+                raw = read_topic(channel).get("close_at", "")
+                if raw.isdigit():
+                    schedule_close(channel.id, guild.id, int(raw))
+
+    asyncio.create_task(runner())
+
+
 class TicketControls(discord.ui.View):
     def __init__(self, claimed_name=None):
         super().__init__(timeout=None)
@@ -1123,30 +1249,102 @@ class TicketControls(discord.ui.View):
             self.claim.disabled = True
             self.claim.label = f"Claimed by {claimed_name}"[:80]
 
-    @discord.ui.button(label="Claim", emoji="🙋", style=discord.ButtonStyle.success, custom_id="ticket_claim")
+    @discord.ui.button(label="Claim", emoji="🟡", style=discord.ButtonStyle.success,
+                       custom_id="ticket_claim", row=0)
     async def claim(self, interaction, button):
         member = interaction.user
+        channel = interaction.channel
         if not is_staff(member):
             await interaction.response.send_message("Only Guide/Mod/Admin/Owner can claim tickets.", ephemeral=True)
             return
-        data = read_topic(interaction.channel)
+        if not is_ticket(channel):
+            await interaction.response.send_message("This only works inside a ticket.", ephemeral=True)
+            return
+        data = read_topic(channel)
         if data.get("claimed", "0") != "0":
             await interaction.response.send_message(
                 f"This ticket has already been claimed by <@{data['claimed']}>.", ephemeral=True)
             return
         data["claimed"] = str(member.id)
-        embed = interaction.message.embeds[0] if interaction.message.embeds else None
-        if embed:
-            for i, field in enumerate(embed.fields):
-                if "Status" in field.name:
-                    embed.set_field_at(i, name=field.name, value=f"Claimed by {member.mention}", inline=True)
-        await interaction.response.edit_message(embed=embed, view=TicketControls(member.display_name))
-        await interaction.channel.send(embed=discord.Embed(
-            description=f"**{member.display_name}** has claimed this ticket and will help you.",
-            colour=0x22C55E))
-        await interaction.channel.edit(topic=write_topic(data))
+        data["status"] = "claimed"
+        embed = _status_embed(interaction.message, f"Claimed by {member.mention}")
+        view = TicketControls(member.display_name)
+        if embed is None:
+            await interaction.response.edit_message(view=view)
+        else:
+            await interaction.response.edit_message(embed=embed, view=view)
+        err = await set_ticket_name(channel, data, ticket_status.claimed_channel_name(member.display_name))
+        text = f"**{member.display_name}** has claimed this ticket and will help you."
+        if err:
+            text += f"\n{err}"
+        await channel.send(embed=discord.Embed(description=text, colour=0xEAB308))
 
-    @discord.ui.button(label="Close", emoji="🔒", style=discord.ButtonStyle.secondary, custom_id="ticket_close")
+    async def _mark(self, interaction, name, status, status_text, announce, colour, ping=""):
+        member = interaction.user
+        channel = interaction.channel
+        if not is_staff(member):
+            await interaction.response.send_message("Only Guide/Mod/Admin/Owner can change ticket status.", ephemeral=True)
+            return
+        if not is_ticket(channel):
+            await interaction.response.send_message("This only works inside a ticket.", ephemeral=True)
+            return
+        data = read_topic(channel)
+        data["status"] = status
+        embed = _status_embed(interaction.message, status_text)
+        view = TicketControls(claimed_label(channel.guild, data))
+        if embed is None:
+            await interaction.response.edit_message(view=view)
+        else:
+            await interaction.response.edit_message(embed=embed, view=view)
+        err = await set_ticket_name(channel, data, name)
+        if err:
+            announce += f"\n{err}"
+        kwargs = {"embed": discord.Embed(description=announce, colour=colour)}
+        if ping:
+            kwargs["content"] = ping
+        await channel.send(**kwargs)
+
+    @discord.ui.button(label="Resolved", emoji="🟢", style=discord.ButtonStyle.success,
+                       custom_id="ticket_resolved", row=0)
+    async def resolved(self, interaction, button):
+        await self._mark(
+            interaction,
+            ticket_status.RESOLVED_NAME,
+            "resolved",
+            "Resolved",
+            "Marked as resolved.",
+            0x22C55E,
+        )
+
+    @discord.ui.button(label="Higher-up needed", emoji="🔴", style=discord.ButtonStyle.danger,
+                       custom_id="ticket_higher", row=0)
+    async def higher(self, interaction, button):
+        channel = interaction.channel
+        ping = " ".join(role.mention for role in roles_named(channel.guild, MOD_PLUS_NAMES)) if is_ticket(channel) else ""
+        await self._mark(
+            interaction,
+            ticket_status.HIGHER_NAME,
+            "higher",
+            "Higher-up needed",
+            "Marked as higher-up needed. A higher staff member has to finish this ticket.",
+            0xEF4444,
+            ping,
+        )
+
+    @discord.ui.button(label="Bug report", emoji="🟣", style=discord.ButtonStyle.primary,
+                       custom_id="ticket_bug", row=1)
+    async def bug(self, interaction, button):
+        await self._mark(
+            interaction,
+            ticket_status.BUG_NAME,
+            "bug",
+            "Bug report",
+            "Marked as a bug report. Staff can write the dev post from this ticket.",
+            0xA855F7,
+        )
+
+    @discord.ui.button(label="Close", emoji="🔒", style=discord.ButtonStyle.secondary,
+                       custom_id="ticket_close", row=1)
     async def close(self, interaction, button):
         member = interaction.user
         channel = interaction.channel
@@ -1170,17 +1368,97 @@ class ConfirmClose(discord.ui.View):
         data = read_topic(channel)
         await interaction.response.edit_message(
             embed=discord.Embed(description="Closing ticket...", colour=0x64748B), view=None)
-        await channel.send(embed=discord.Embed(
-            description=f"Ticket closed by {member.mention}. This channel will be deleted in 5 seconds.",
-            colour=0xEF4444))
-        await send_transcript(channel, member, data)
-        await asyncio.sleep(5)
-        await channel.delete(reason=f"Ticket closed by {member}")
+        await close_ticket_channel(channel, member, data, f"Ticket closed by {member.mention}.")
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
     async def no(self, interaction, button):
         await interaction.response.edit_message(
             embed=discord.Embed(description="Okay, the ticket stays open.", colour=0x64748B), view=None)
+
+
+class CloseRequestView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Approve close", emoji="✅", style=discord.ButtonStyle.success,
+                       custom_id="ticket_close_approve")
+    async def approve(self, interaction, button):
+        channel = interaction.channel
+        data = read_topic(channel)
+        if data.get("owner") != str(interaction.user.id):
+            await interaction.response.send_message(
+                "Only the person who opened this ticket can approve the close.", ephemeral=True)
+            return
+        await interaction.response.edit_message(
+            embed=discord.Embed(description="Approved. Closing the ticket...", colour=0x64748B), view=None)
+        await close_ticket_channel(
+            channel,
+            interaction.user,
+            data,
+            f"Ticket closed by {interaction.user.mention} (close request approved).",
+        )
+
+    @discord.ui.button(label="Keep open", style=discord.ButtonStyle.secondary, custom_id="ticket_close_keep")
+    async def keep(self, interaction, button):
+        channel = interaction.channel
+        data = read_topic(channel)
+        if data.get("owner") != str(interaction.user.id):
+            await interaction.response.send_message(
+                "Only the person who opened this ticket can answer this.", ephemeral=True)
+            return
+        data.pop("close_at", None)
+        task = _close_tasks.pop(channel.id, None)
+        if task is not None and not task.done():
+            task.cancel()
+        try:
+            await channel.edit(topic=write_topic(data), reason="close request cancelled")
+        except discord.HTTPException as exc:
+            await interaction.response.send_message(f"Could not cancel the close: {exc}", ephemeral=True)
+            return
+        await interaction.response.edit_message(
+            embed=discord.Embed(description="The ticket stays open.", colour=0x22C55E), view=None)
+        await channel.send(embed=discord.Embed(
+            description=f"{interaction.user.mention} kept this ticket open.",
+            colour=0x22C55E))
+
+
+close_group = app_commands.Group(name="close", description="Ask the ticket opener to approve a close")
+
+
+@close_group.command(name="request", description="Ask the opener to approve. Closes after the given hours if they do not answer.")
+@app_commands.guild_only()
+@app_commands.describe(hours="Hours to wait for the opener (1-168)")
+async def close_request(interaction: discord.Interaction, hours: app_commands.Range[int, 1, 168]):
+    if not is_staff(interaction.user) or not is_ticket(interaction.channel):
+        await interaction.response.send_message("Only staff can do this, inside a ticket.", ephemeral=True)
+        return
+    channel = interaction.channel
+    data = read_topic(channel)
+    owner_id = data.get("owner", "")
+    if not owner_id.isdigit():
+        await interaction.response.send_message("This ticket has no opener on record.", ephemeral=True)
+        return
+    deadline = ticket_status.close_deadline(int(hours), time.time())
+    data["close_at"] = str(deadline)
+    try:
+        await channel.edit(topic=write_topic(data), reason="close request")
+    except discord.HTTPException as exc:
+        await interaction.response.send_message(f"Could not save the close request: {exc}", ephemeral=True)
+        return
+    schedule_close(channel.id, channel.guild.id, deadline)
+    embed = discord.Embed(
+        title="Close request",
+        description=(
+            f"{interaction.user.mention} asked to close this ticket.\n"
+            f"<@{owner_id}>, press **Approve close** to close it now, or **Keep open** to cancel.\n"
+            f"If you do not answer, the ticket closes <t:{deadline}:R> (<t:{deadline}:F>)."
+        ),
+        colour=0xEF4444,
+    )
+    await interaction.response.send_message(content=f"<@{owner_id}>", embed=embed, view=CloseRequestView())
+
+
+bot.tree.add_command(close_group)
 
 
 # ---------- slash commands ----------
@@ -1343,6 +1621,7 @@ async def setupdiscord(
         plan_lines.append(f"• **{cat_name}** — " + ", ".join(bits))
     plan_lines.append(
         "\n**Aliases:** media↔showcase, suggestions↔feedback, etc.\n"
+        "**Rank rooms:** #donater (Islander, Surfer), #donater➕ (Captain, Tycoon, Mogul)\n"
         "**On join:** Member role + welcome in #welcome\n"
         f"**create_missing:** `{create_missing}` "
         "(keep False so nothing new is created)"
@@ -1410,6 +1689,10 @@ async def setupdiscord(
                 except discord.HTTPException:
                     pass
 
+    try:
+        rank_made = await account_link.ensure_rank_rooms(guild)
+    except discord.HTTPException as e:
+        rank_made = [f"rank rooms failed ({e})"]
     rules_ch = find_layout_channel(guild, RULES_CHANNEL)
     faq_ch = find_layout_channel(guild, FAQ_CHANNEL)
     support_ch = find_layout_channel(guild, SUPPORT_CHANNEL)
@@ -1418,6 +1701,7 @@ async def setupdiscord(
         f"**Roles created:** {', '.join(created_roles) if created_roles else 'none (already existed)'}",
         f"**Channels used:** {', '.join(used) if used else 'none'}",
         f"**Created:** {', '.join(created_channels) if created_channels else 'none'}",
+        f"**Rank rooms:** {', '.join(rank_made) if rank_made else 'already in place'}",
     ]
     if missing:
         summary.append("**Skipped (not found):** `" + "`, `".join(missing) + "`")
@@ -1471,21 +1755,41 @@ async def on_member_join(member):
     await channel.send(content=member.mention, embed=welcome_embed(member))
 
 
+# Register /manage at import time (before setup_hook) so Wispbyte always loads it.
+staff_manage.setup(bot)
+account_link.setup(bot)
+
+
 @bot.event
 async def setup_hook():
     bot.add_view(PanelView())
     bot.add_view(TicketControls())
+    bot.add_view(CloseRequestView())
     bot.add_view(PlatformView())
-    await bot.load_extension("tt_admin")
+    staff_manage.setup(bot)
+    account_link.setup(bot)
 
 
 @bot.event
 async def on_ready():
     print(f"Tropical Tycoon bot online as {bot.user} ({len(bot.guilds)} servers).", flush=True)
+    names = sorted({c.name for c in bot.tree.get_commands()})
+    print(f"  slash commands in tree: {', '.join(names) if names else '(none)'}", flush=True)
+    synced_names: list[str] = []
     for guild in bot.guilds:
         bot.tree.copy_global_to(guild=guild)
-        await bot.tree.sync(guild=guild)
-        print(f"  synced commands on {guild.name}", flush=True)
+        synced = await bot.tree.sync(guild=guild)
+        synced_names = sorted({c.name for c in synced})
+        print(
+            f"  synced {len(synced)} commands on {guild.name}: "
+            + ", ".join(synced_names),
+            flush=True,
+        )
+    if not getattr(bot, "_tt_staff_log_pinged", False):
+        bot._tt_staff_log_pinged = True  # type: ignore[attr-defined]
+        await staff_manage.notify_connected(synced_names or names)
+    resume_close_requests()
+    account_link.start_loop(bot)
 
 
 if __name__ == "__main__":
