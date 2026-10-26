@@ -1,15 +1,16 @@
 """
-Tropical Tycoon Discord bot — tickets, welcome, rules and server layout (English).
+Tropical Tycoon Discord bot — tickets, welcome, rules and staff tools (English).
 
 Admin:
 - /setupdiscord  reuse existing channels + apply permissions (confirm=True).
                  create_missing=True only if you want new channels created.
 - /setupperms    lock existing info channels (read-only for members, Staff can post)
 - /panel         ticket panel
+- /manage        Staff Control Center (owner only)
 - /postrules /postfaq  post content in the current channel
 
-Anyone:
-- /rules
+Owner: /lookup /givekeys /givexp /move /kick /announce /serverstatus /acrecent
+Anyone: /rules /play
 Staff (in a ticket): /add /remove
 
 Privileged intent: Server Members + Message Content in the Developer Portal,
@@ -28,6 +29,8 @@ import certifi
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+import staff_manage
 
 def load_env():
     """Load KEY=value from .env / info.inv (fills empty panel vars; non-empty env wins)."""
@@ -1471,20 +1474,36 @@ async def on_member_join(member):
     await channel.send(content=member.mention, embed=welcome_embed(member))
 
 
+# Register /manage at import time (before setup_hook) so Wispbyte always loads it.
+staff_manage.setup(bot)
+
+
 @bot.event
 async def setup_hook():
     bot.add_view(PanelView())
     bot.add_view(TicketControls())
     bot.add_view(PlatformView())
+    staff_manage.setup(bot)
 
 
 @bot.event
 async def on_ready():
     print(f"Tropical Tycoon bot online as {bot.user} ({len(bot.guilds)} servers).", flush=True)
+    names = sorted({c.name for c in bot.tree.get_commands()})
+    print(f"  slash commands in tree: {', '.join(names) if names else '(none)'}", flush=True)
+    synced_names: list[str] = []
     for guild in bot.guilds:
         bot.tree.copy_global_to(guild=guild)
-        await bot.tree.sync(guild=guild)
-        print(f"  synced commands on {guild.name}", flush=True)
+        synced = await bot.tree.sync(guild=guild)
+        synced_names = sorted({c.name for c in synced})
+        print(
+            f"  synced {len(synced)} commands on {guild.name}: "
+            + ", ".join(synced_names),
+            flush=True,
+        )
+    if not getattr(bot, "_tt_staff_log_pinged", False):
+        bot._tt_staff_log_pinged = True  # type: ignore[attr-defined]
+        await staff_manage.notify_connected(synced_names or names)
 
 
 if __name__ == "__main__":
