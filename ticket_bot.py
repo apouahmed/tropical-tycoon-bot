@@ -1352,7 +1352,7 @@ async def setupdiscord(
         plan_lines.append(f"• **{cat_name}** — " + ", ".join(bits))
     plan_lines.append(
         "\n**Aliases:** media↔showcase, suggestions↔feedback, etc.\n"
-        "**Rank rooms:** #below-captain (Islander, Surfer), #above-captain (Captain, Tycoon, Mogul)\n"
+        "**Rank rooms:** #donater (Islander, Surfer), #donater➕ (Captain, Tycoon, Mogul)\n"
         "**On join:** Member role + welcome in #welcome\n"
         f"**create_missing:** `{create_missing}` "
         "(keep False so nothing new is created)"

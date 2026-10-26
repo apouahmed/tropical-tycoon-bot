@@ -42,14 +42,19 @@ class RankSyncTest(unittest.TestCase):
         self.assertIn("Guide", plan.remove)
         self.assertEqual(plan.managed_staff, "Mod")
 
-    def test_captain_shares_the_upper_room(self) -> None:
+    def test_donater_channels(self) -> None:
         rooms = {room.name: room for room in ranks.RANK_ROOMS}
-        self.assertEqual(set(rooms), {"below-captain", "above-captain"})
-        self.assertEqual(rooms["below-captain"].allow, ("Islander", "Surfer"))
-        self.assertNotIn("Captain", rooms["below-captain"].allow)
-        self.assertEqual(rooms["above-captain"].allow, ("Captain", "Tycoon", "Mogul"))
-        self.assertNotIn("Islander", rooms["above-captain"].allow)
-        self.assertEqual(ranks.RETIRED_RANK_CHANNELS, ("captain",))
+        self.assertEqual(set(rooms), {ranks.DONATER_CHANNEL, ranks.DONATER_PLUS_CHANNEL})
+        self.assertEqual(rooms[ranks.DONATER_CHANNEL].allow, ("Islander", "Surfer"))
+        self.assertNotIn("Captain", rooms[ranks.DONATER_CHANNEL].allow)
+        plus = rooms[ranks.DONATER_PLUS_CHANNEL]
+        self.assertEqual(plus.allow, ("Captain", "Tycoon", "Mogul"))
+        self.assertNotIn("Islander", plus.allow)
+        self.assertNotIn("+", plus.name)
+        self.assertTrue(plus.name.startswith("donater"))
+        self.assertEqual(ranks.RANK_CHANNEL_RENAMES["below-captain"], ranks.DONATER_CHANNEL)
+        self.assertEqual(ranks.RANK_CHANNEL_RENAMES["above-captain"], ranks.DONATER_PLUS_CHANNEL)
+        self.assertIn("captain", ranks.RETIRED_RANK_CHANNELS)
 
     def test_failed_lookup_is_not_treated_as_no_rank(self) -> None:
         self.assertFalse(ranks.groups_response_ok("Could not find user Steve"))

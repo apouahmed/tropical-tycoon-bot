@@ -39,21 +39,29 @@ class RankRoom:
         self.allow = allow
 
 
-# Islander and Surfer share a room. Captain sits with Tycoon and Mogul.
+# Discord rejects an ASCII "+" in channel names, so Donater+ uses a plus emoji.
+DONATER_CHANNEL = "donater"
+DONATER_PLUS_CHANNEL = "donater\u2795"
+
+# Islander and Surfer share Donater. Captain, Tycoon and Mogul share Donater+.
 RANK_ROOMS: tuple[RankRoom, ...] = (
     RankRoom(
-        "below-captain",
-        "Islander and Surfer only. Captain and above do not have access.",
+        DONATER_CHANNEL,
+        "Islander and Surfer. Captain and above do not have access.",
         ("Islander", "Surfer"),
     ),
     RankRoom(
-        "above-captain",
+        DONATER_PLUS_CHANNEL,
         "Captain, Tycoon and Mogul.",
         ("Captain", "Tycoon", "Mogul"),
     ),
 )
-# Dropped when Captain moved into #above-captain. Only removed inside the RANKS category.
-RETIRED_RANK_CHANNELS = ("captain",)
+# Previous names. Renamed when the new channel is missing, otherwise removed inside RANKS.
+RANK_CHANNEL_RENAMES = {
+    "below-captain": DONATER_CHANNEL,
+    "above-captain": DONATER_PLUS_CHANNEL,
+}
+RETIRED_RANK_CHANNELS = ("captain", "below-captain", "above-captain")
 RANK_CATEGORY = "RANKS"
 STAFF_ROLE_NAMES = frozenset(display for _, display in STAFF_LADDER)
 KNOWN_GROUPS = frozenset(

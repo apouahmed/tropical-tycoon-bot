@@ -398,6 +398,15 @@ async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
         for name in ("Guide", "Mod", "Admin", "Owner")
         if (role := _role_named(guild, name)) is not None
     ]
+    for old in list(category.channels):
+        if not isinstance(old, discord.TextChannel):
+            continue
+        new_name = rank_sync.RANK_CHANNEL_RENAMES.get(old.name)
+        if not new_name or discord.utils.get(guild.text_channels, name=new_name) is not None:
+            continue
+        await old.edit(name=new_name, reason="Tropical Tycoon rank channel rename")
+        made.append(f"#{old.name}->#{new_name}")
+        await asyncio.sleep(0.3)
     live_names = {room.name for room in rank_sync.RANK_ROOMS}
     for old in list(category.channels):
         if (
@@ -405,7 +414,7 @@ async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
             and old.name in rank_sync.RETIRED_RANK_CHANNELS
             and old.name not in live_names
         ):
-            await old.delete(reason="Captain now uses #above-captain")
+            await old.delete(reason="Replaced by the Donater channels")
             made.append(f"removed:#{old.name}")
             await asyncio.sleep(0.3)
     for room in rank_sync.RANK_ROOMS:
