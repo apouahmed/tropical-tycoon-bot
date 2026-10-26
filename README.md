@@ -4,9 +4,14 @@ Tickets, welcome, rules/FAQ, `/setupdiscord`, Java/Bedrock roles, and an owner-o
 
 ## What the bot can do
 Anyone: `/rules`, `/play`, `/link`, `/unlink`, `/ranksync`.
-Staff in a ticket: `/add`, `/remove`.
+Staff in a ticket: `/add`, `/remove`, `/close request`.
 Admin: `/setupdiscord`, `/setupperms`, `/panel`, `/postrules`, `/postfaq`.
 Server owner: `/manage` plus `/lookup`, `/givekeys`, `/givexp`, `/move`, `/kick`, `/announce`, `/serverstatus`, `/acrecent`.
+
+## Ticket names
+Claim renames the channel to `🟡-` plus that staff member's name. Staff buttons rename it to `🟢-resolved`, `🔴-higher-up-needed`, or `🟣-bug-report`. Higher-up needed pings Mod and above. Bug report is only the rename: staff write the dev post themselves.
+
+`/close request` asks the person who opened the ticket to approve, with a wait of 1 to 168 hours. **Approve close** closes it immediately. **Keep open** cancels the timer. If they do not answer, the bot saves the transcript and deletes the channel when the time is up. The Close button still closes immediately. A restart does not forget a pending close.
 
 ## Rank roles
 `/link` asks for your Minecraft name and whispers a code in-game (you must be online). Enter that code in Discord. The bot then reads your LuckPerms groups and sets one store role (Islander, Surfer, Captain, Tycoon or Mogul). Staff groups (Guide, Mod, Admin, Owner) are applied the same way. A role this bot did not assign is left in place.
