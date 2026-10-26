@@ -28,6 +28,36 @@ STAFF_LADDER: tuple[tuple[str, str], ...] = (
     ("guide", "Guide"),
 )
 STORE_ROLE_NAMES = frozenset(display for _, display, _ in STORE_LADDER)
+
+
+class RankRoom:
+    """One private channel. Captain is not in the room below or the room above."""
+
+    def __init__(self, name: str, topic: str, allow: tuple[str, ...]) -> None:
+        self.name = name
+        self.topic = topic
+        self.allow = allow
+
+
+# Islander and Surfer share a room Captain cannot see. Tycoon and Mogul share the room above.
+RANK_ROOMS: tuple[RankRoom, ...] = (
+    RankRoom(
+        "below-captain",
+        "Islander and Surfer only. Captain and above do not have access.",
+        ("Islander", "Surfer"),
+    ),
+    RankRoom(
+        "captain",
+        "Captain only.",
+        ("Captain",),
+    ),
+    RankRoom(
+        "above-captain",
+        "Tycoon and Mogul.",
+        ("Tycoon", "Mogul"),
+    ),
+)
+RANK_CATEGORY = "RANKS"
 STAFF_ROLE_NAMES = frozenset(display for _, display in STAFF_LADDER)
 KNOWN_GROUPS = frozenset(
     [key for key, _, _ in STORE_LADDER] + [key for key, _ in STAFF_LADDER] + ["default"]

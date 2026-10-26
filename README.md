@@ -11,6 +11,14 @@ Server owner: `/manage` plus `/lookup`, `/givekeys`, `/givexp`, `/move`, `/kick`
 ## Rank roles
 `/link` asks for your Minecraft name and whispers a code in-game (you must be online). Enter that code in Discord. The bot then reads your LuckPerms groups and sets one store role (Islander, Surfer, Captain, Tycoon or Mogul). Staff groups (Guide, Mod, Admin, Owner) are applied the same way. A role this bot did not assign is left in place.
 
+On startup, and again from `/setupdiscord confirm:True`, the bot creates those five roles if they are missing, plus a **RANKS** category:
+
+- `#below-captain` — Islander and Surfer. Captain, Tycoon and Mogul cannot see it.
+- `#captain` — Captain only.
+- `#above-captain` — Tycoon and Mogul.
+
+Guide and above can see all three, unless they also wear a store role that is denied there (Discord deny wins).
+
 Every `RANK_SYNC_MINUTES` (default 10) it checks linked accounts again, including after a Tebex rank. `/ranksync` refreshes you immediately. A store rank granted from `/manage` refreshes that linked member too.
 
 The bot's own role must sit above those rank roles, and it needs **Manage Roles**. RCON has to be set or `/link` cannot whisper the code.

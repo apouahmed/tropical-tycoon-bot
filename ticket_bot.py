@@ -1352,6 +1352,7 @@ async def setupdiscord(
         plan_lines.append(f"• **{cat_name}** — " + ", ".join(bits))
     plan_lines.append(
         "\n**Aliases:** media↔showcase, suggestions↔feedback, etc.\n"
+        "**Rank rooms:** #below-captain (Islander, Surfer), #captain, #above-captain (Tycoon, Mogul)\n"
         "**On join:** Member role + welcome in #welcome\n"
         f"**create_missing:** `{create_missing}` "
         "(keep False so nothing new is created)"
@@ -1419,6 +1420,10 @@ async def setupdiscord(
                 except discord.HTTPException:
                     pass
 
+    try:
+        rank_made = await account_link.ensure_rank_rooms(guild)
+    except discord.HTTPException as e:
+        rank_made = [f"rank rooms failed ({e})"]
     rules_ch = find_layout_channel(guild, RULES_CHANNEL)
     faq_ch = find_layout_channel(guild, FAQ_CHANNEL)
     support_ch = find_layout_channel(guild, SUPPORT_CHANNEL)
@@ -1427,6 +1432,7 @@ async def setupdiscord(
         f"**Roles created:** {', '.join(created_roles) if created_roles else 'none (already existed)'}",
         f"**Channels used:** {', '.join(used) if used else 'none'}",
         f"**Created:** {', '.join(created_channels) if created_channels else 'none'}",
+        f"**Rank rooms:** {', '.join(rank_made) if rank_made else 'already in place'}",
     ]
     if missing:
         summary.append("**Skipped (not found):** `" + "`, `".join(missing) + "`")

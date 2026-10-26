@@ -367,6 +367,90 @@ def setup(bot: discord.Client) -> None:
     print("Account link commands loaded: /link /unlink /ranksync", flush=True)
 
 
+async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
+    """Create store roles and the three rank channels. Safe to run again."""
+    made: list[str] = []
+    me = guild.me
+    if me is None or not me.guild_permissions.manage_roles or not me.guild_permissions.manage_channels:
+        print(f"Rank rooms skipped in {guild.name}: need Manage Roles and Manage Channels.", flush=True)
+        return made
+    for _key, display, colour in rank_sync.STORE_LADDER:
+        if _role_named(guild, display) is None:
+            await guild.create_role(
+                name=display,
+                colour=discord.Colour(colour),
+                hoist=True,
+                mentionable=False,
+                reason="Tropical Tycoon store rank",
+            )
+            made.append(f"role:{display}")
+            await asyncio.sleep(0.3)
+    category = discord.utils.get(guild.categories, name=rank_sync.RANK_CATEGORY)
+    if category is None:
+        category = await guild.create_category(
+            rank_sync.RANK_CATEGORY, reason="Tropical Tycoon rank channels"
+        )
+        made.append(f"category:{rank_sync.RANK_CATEGORY}")
+        await asyncio.sleep(0.3)
+    everyone = guild.default_role
+    staff = [
+        role
+        for name in ("Guide", "Mod", "Admin", "Owner")
+        if (role := _role_named(guild, name)) is not None
+    ]
+    for room in rank_sync.RANK_ROOMS:
+        channel = discord.utils.get(guild.text_channels, name=room.name)
+        if channel is None:
+            channel = await guild.create_text_channel(
+                room.name,
+                category=category,
+                topic=room.topic,
+                reason="Tropical Tycoon rank channel",
+            )
+            made.append(f"#{room.name}")
+            await asyncio.sleep(0.3)
+        elif channel.category != category:
+            await channel.edit(category=category, reason="Tropical Tycoon rank channel")
+        await channel.set_permissions(
+            everyone, view_channel=False, send_messages=False, reason="rank channel hidden"
+        )
+        allowed_names = set(room.allow)
+        for name in allowed_names:
+            role = _role_named(guild, name)
+            if role is None:
+                continue
+            await channel.set_permissions(
+                role,
+                view_channel=True,
+                send_messages=True,
+                read_message_history=True,
+                attach_files=True,
+                embed_links=True,
+                add_reactions=True,
+                reason="rank channel access",
+            )
+        for name in rank_sync.STORE_ROLE_NAMES - allowed_names:
+            role = _role_named(guild, name)
+            if role is None:
+                continue
+            await channel.set_permissions(
+                role, view_channel=False, send_messages=False, reason="rank channel excluded"
+            )
+        for role in staff:
+            await channel.set_permissions(
+                role,
+                view_channel=True,
+                send_messages=True,
+                read_message_history=True,
+                manage_messages=True,
+                reason="rank channel staff",
+            )
+        await asyncio.sleep(0.3)
+    if made:
+        print(f"Rank rooms in {guild.name}: {', '.join(made)}", flush=True)
+    return made
+
+
 def start_loop(bot: discord.Client) -> None:
     if getattr(bot, "_tt_rank_sync_started", False):
         return
@@ -378,6 +462,11 @@ def start_loop(bot: discord.Client) -> None:
 
     async def runner() -> None:
         await bot.wait_until_ready()
+        for guild in list(bot.guilds):
+            try:
+                await ensure_rank_rooms(guild)
+            except discord.HTTPException as e:
+                print(f"Rank rooms failed in {guild.name}: {e}", flush=True)
         while not bot.is_closed():
             await asyncio.sleep(minutes * 60)
             try:
