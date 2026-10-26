@@ -10,7 +10,7 @@ Admin:
 - /postrules /postfaq  post content in the current channel
 
 Owner: /lookup /givekeys /givexp /move /kick /announce /serverstatus /acrecent
-Anyone: /rules /play
+Anyone: /rules /play /link /unlink /ranksync
 Staff (in a ticket): /add /remove
 
 Privileged intent: Server Members + Message Content in the Developer Portal,
@@ -30,6 +30,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+import account_link
 import staff_manage
 
 def load_env():
@@ -84,6 +85,11 @@ ROLE_SPECS = (
     (ADMIN_ROLE, discord.Colour.red(), True),
     (MOD_ROLE, discord.Colour.blue(), True),
     (GUIDE_ROLE, discord.Colour.teal(), True),
+    ("Mogul", discord.Colour(0xFF6F00), True),
+    ("Tycoon", discord.Colour(0x00838F), True),
+    ("Captain", discord.Colour(0x1565C0), True),
+    ("Surfer", discord.Colour(0x29B6F6), True),
+    ("Islander", discord.Colour(0xC9A227), True),
     (MEMBER_ROLE, discord.Colour.dark_grey(), False),
     (JAVA_ROLE, discord.Colour.green(), False),
     (BEDROCK_ROLE, discord.Colour.blurple(), False),
@@ -1476,6 +1482,7 @@ async def on_member_join(member):
 
 # Register /manage at import time (before setup_hook) so Wispbyte always loads it.
 staff_manage.setup(bot)
+account_link.setup(bot)
 
 
 @bot.event
@@ -1484,6 +1491,7 @@ async def setup_hook():
     bot.add_view(TicketControls())
     bot.add_view(PlatformView())
     staff_manage.setup(bot)
+    account_link.setup(bot)
 
 
 @bot.event
@@ -1504,6 +1512,7 @@ async def on_ready():
     if not getattr(bot, "_tt_staff_log_pinged", False):
         bot._tt_staff_log_pinged = True  # type: ignore[attr-defined]
         await staff_manage.notify_connected(synced_names or names)
+    account_link.start_loop(bot)
 
 
 if __name__ == "__main__":

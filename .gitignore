@@ -2,6 +2,8 @@
 info.inv
 info.env
 ticket_counter.json
+links.json
+links.json.tmp
 __pycache__/
 .local/
 .cache/

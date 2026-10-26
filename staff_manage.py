@@ -33,6 +33,9 @@ from discord.ext import commands
 import rcon_client
 import staff_actions
 
+# Set by account_link.setup. Called after a store rank grant succeeds.
+after_store_grant = None
+
 BRAND = 0x2EE6A6
 GOLD = 0xFFD166
 PINK = 0xFF7EB6
@@ -731,6 +734,11 @@ class StoreRankModal(discord.ui.Modal, title="Apply store rank"):
             colour=colour,
             actor=interaction.user,
         )
+        if ok and after_store_grant is not None:
+            try:
+                await after_store_grant(interaction.client, name)
+            except Exception as e:
+                print(f"rank sync after store grant failed: {e}", flush=True)
 
 
 class GiveXpModal(discord.ui.Modal, title="Grant Tycoon XP"):
