@@ -5,6 +5,7 @@ Admin:
 - /setupdiscord  reuse existing channels + apply permissions (confirm=True).
                  create_missing=True only if you want new channels created.
 - /setupperms    lock existing info channels (read-only for members, Staff can post)
+- /setupstaff    staff server only: rank rooms, handbook, private owner channels
 - /panel         ticket panel
 - /postrules /postfaq  post content in the current channel
 
@@ -28,6 +29,8 @@ import certifi
 import discord
 from discord import app_commands
 from discord.ext import commands
+
+import staff_discord
 
 def load_env():
     """Load KEY=value from .env / info.inv (fills empty panel vars; non-empty env wins)."""
@@ -584,30 +587,7 @@ def rules_embeds(guild):
         ),
         colour=PINK,
     )
-    rows = [
-        ("Spam, flooding, caps", "Warning → 10m mute → 30m mute → 1h+ mute"),
-        ("Minor insults, toxicity", "Warning → 30m mute → 2h mute → 12h mute"),
-        ("Harassment, bodyshaming", "1h mute → 6h mute → 1d mute → 3d+ ban"),
-        ("Hate speech, slurs", "1d mute → 3d mute → 7d mute → Permanent ban"),
-        ("Threats (DDoS, dox, harm)", "1d ban → 7d ban → Permanent ban"),
-        ("Sexual / NSFW content", "1d mute → 3d mute → 7d mute → Permanent ban"),
-        ("Advertising other servers", "1d ban → 3d ban → 7d ban → Permanent ban"),
-        ("Inappropriate name, skin or build", "Ban until changed → +1d → 7d ban → Permanent ban"),
-        ("Impersonation", "1d ban → 7d ban → Permanent ban"),
-        ("Personal info / phishing", "Permanent ban"),
-        ("Macro, autoclicker, AFK-farming", "1d ban → 3d ban → 7d ban → 30d ban"),
-        ("Cheats / hacked client", "7d ban → 30d ban → Permanent ban"),
-        ("Bug abuse", "Warning + rollback → 1d ban → 7d ban → Permanent ban"),
-        ("Duping / exploiting", "7d ban + rollback → Permanent ban"),
-        ("Griefing", "1d ban + restore → 3d ban → 7d ban → Permanent ban"),
-        ("Stealing", "Warning + return items → 1d ban → 3d ban → 7d+ ban"),
-        ("Scamming", "7d ban → Permanent ban"),
-        ("Real-money trading", "7d ban + item removal → Permanent ban"),
-        ("Ban evasion / alt to break rules", "Permanent ban"),
-        ("Chargeback", "Permanent ban"),
-        ("Lying to staff / false reports", "Warning → 1h mute → 6h mute → 1d ban"),
-        ("Staff disrespect", "Warning → 1h mute → 6h mute → 1d+ mute"),
-    ]
+    rows = staff_discord.PUNISHMENT_LADDER
     for name, value in rows[:12]:
         punish.add_field(name=name, value=value, inline=False)
     footer(punish, guild)
@@ -1485,6 +1465,13 @@ async def on_ready():
         bot.tree.copy_global_to(guild=guild)
         await bot.tree.sync(guild=guild)
         print(f"  synced commands on {guild.name}", flush=True)
+    try:
+        await staff_discord.sync_staff_guild(bot)
+    except Exception as exc:
+        print(f"staff discord sync failed: {exc}", flush=True)
+
+
+staff_discord.setup(bot)
 
 
 if __name__ == "__main__":
