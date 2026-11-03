@@ -37,7 +37,7 @@ The bot's own role must sit above those rank roles, and it needs **Manage Roles*
 5. `AUTO_UPDATE` = `1`
 6. Variables: `DISCORD_TOKEN`, `DISCORD_PRIVILEGED_INTENTS=1`, plus `RCON_HOST`, `RCON_PORT`, `RCON_PASSWORD` if the owner tools should reach the skyblock console. Optional: `STAFF_LOG_WEBHOOK`, `AC_LOG_CHANNEL_ID`.
 7. Start → in Discord run `/setupdiscord` then `/setupdiscord confirm:True`
-8. On the staff server (`1567210660516073504`) the bot also builds the staff rooms on startup: handbook, Guide/Mod/Admin chats, and a private channel with the owner for each staff role. Run `/setupstaff confirm:True` there to build them again.
+8. On the staff server (`1567210660516073504`) startup builds the workplace: start page, onboarding, handbook (conduct, ranks, ladder, cases, appeals, desk), floor chat and voice, Guide/Mod/Admin rooms, and a private channel with the owner. A new rank posts that person's ceiling in their private channel. `/setupstaff confirm:True` builds it again. `refresh_docs:True` reposts the handbook.
 
 Bot needs **Manage Channels** + **Manage Roles** (its role above Member, Java, Bedrock, the rank roles, and Guide/Mod/Admin).
 

@@ -35,26 +35,71 @@ class StaffDiscordTests(unittest.TestCase):
         self.assertIsNone(staff.topic_user_id("just a topic"))
 
     def test_handbook_fits_discord_limits(self):
-        embeds = staff.staff_handbook_embeds("Tropical Tycoon")
-        self.assertGreaterEqual(len(embeds), 6)
-        titles = [embed.title for embed in embeds]
-        self.assertIn("✦  How Tropical Tycoon staff act", titles)
-        self.assertTrue(any(embed.title == "What your rank may do in-game" for embed in embeds))
+        mentions = {"conduct": "<#1>", "ranks": "<#2>", "ladder": "<#3>"}
+        sections = staff.handbook_sections("Tropical Tycoon", None, mentions)
+        self.assertEqual(
+            set(sections),
+            {"start-here", "onboarding", "handbook", "conduct", "ranks", "ladder", "cases", "appeals", "desk"},
+        )
+        embeds = staff.staff_handbook_embeds("Tropical Tycoon", None, mentions)
+        self.assertGreaterEqual(len(embeds), 10)
         blob = "\n".join(
-            (embed.description or "") + "\n".join(field.value for field in embed.fields)
+            (embed.title or "") + (embed.description or "") + "\n".join(
+                field.name + field.value for field in embed.fields
+            )
             for embed in embeds
         )
-        self.assertIn("1 hour", blob)
-        self.assertIn("7 days", blob)
-        self.assertIn("Guide", blob)
-        self.assertIn("permanent ban", blob.lower())
+        for phrase in (
+            "1 hour",
+            "7 days",
+            "Store ranks",
+            "Islander",
+            "Floodgate",
+            "Punishment Appeal",
+            "IGN:",
+            "chargeback",
+            "/gens give",
+            "Creative and other gamemodes",
+        ):
+            self.assertIn(phrase.lower(), blob.lower(), phrase)
+        self.assertIn("<#1>", blob)
         for embed in embeds:
-            self.assertLessEqual(len(embed), 6000)
+            self.assertLessEqual(len(embed), 6000, embed.title)
+            self.assertLessEqual(len(embed.title or ""), 256)
+            self.assertLessEqual(len(embed.description or ""), 4096)
             self.assertLessEqual(len(embed.fields), 25)
             for field in embed.fields:
                 self.assertLessEqual(len(field.name), 256)
                 self.assertLessEqual(len(field.value), 1024)
                 self.assertGreater(len(field.value), 0)
+
+    def test_layout_covers_the_workplace(self):
+        rooms = [
+            (logical, kind)
+            for _category, channels in staff.STAFF_LAYOUT
+            for logical, _topic, _mode, kind in channels
+        ]
+        names = [name for name, _kind in rooms]
+        for required in (
+            "start-here", "onboarding", "handbook", "conduct", "ranks", "ladder",
+            "cases", "appeals", "desk", "staff-news", "staff-chat", "staff-voice",
+            "guide-chat", "mod-chat", "admin-chat",
+        ):
+            self.assertIn(required, names)
+        self.assertEqual(dict(rooms)["staff-voice"], "voice")
+        self.assertFalse(staff.docs_are_current("tt-staff-docs=1", "conduct"))
+        self.assertTrue(staff.docs_are_current(staff.channel_docs_marker("conduct"), "conduct"))
+
+    def test_highest_rank_and_brief(self):
+        self.assertIsNone(staff.highest_rank(["Member", "Islander"]))
+        self.assertEqual(staff.highest_rank(["Guide", "Mod"]), "Mod")
+        self.assertEqual(staff.highest_rank(["Admin", "Guide"]), "Admin")
+        brief = staff.rank_brief_embed("Tropical Tycoon", None, "Guide")
+        self.assertIn("1 hour", brief.description)
+        self.assertNotIn("permaban", brief.description.lower())
+        mod = staff.rank_brief_embed("Tropical Tycoon", None, "Mod")
+        self.assertIn("7 days", mod.description)
+        self.assertIn("cannot permaban", mod.description.lower())
 
     def test_punishment_ladder_matches_public_rule_count(self):
         self.assertEqual(len(staff.PUNISHMENT_LADDER), 22)

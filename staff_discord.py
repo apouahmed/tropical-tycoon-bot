@@ -40,25 +40,45 @@ ROLE_SPECS = (
     (GUIDE_ROLE, discord.Colour.teal(), True),
 )
 
-# (category, (logical name, topic, mode)).
+# (category, (logical name, topic, mode, kind)).
 # mode: news | docs | all | guide | mod | admin
+# kind: text | voice. A higher rank sees every room below it. No explicit deny on a
+# lower role, or someone who also holds the higher role would be locked out.
 STAFF_LAYOUT = (
-    ("🌴 STAFF HQ", (
-        ("staff-news", "Rank changes, outages, and decisions. Guide+ can read. Admin+ can post.", "news"),
-        ("staff-chat", "All staff. Keep case talk short and take private things to your owner channel.", "all"),
+    ("🌴 START", (
+        ("start-here", "Read this first. What this server is, and which room is for what.", "docs", "text"),
+        ("onboarding", "The checklist for your first week. Do this before you punish anyone.", "docs", "text"),
     )),
     ("📖 HANDBOOK", (
-        ("handbook", "How Tropical Tycoon staff act, in-game and on Discord. Guide+ can read. Admin+ can post.", "docs"),
+        ("handbook", "Index of the staff handbook. The public rules are still the rules.", "docs", "text"),
+        ("conduct", "How staff behave. Proof, tone, conflicts, and your private channel.", "docs", "text"),
+        ("ranks", "Guide, Mod, Admin, Owner. Store ranks are not staff ranks.", "docs", "text"),
+        ("ladder", "The same punishment table as the public rules, and how to apply it.", "docs", "text"),
+        ("cases", "How to write a case, and what to do in the situations that actually happen.", "docs", "text"),
+        ("appeals", "Reports, appeals, refunds, and when you stay off your own case.", "docs", "text"),
+        ("desk", "Tickets, public chat, voice, and which staff room a message belongs in.", "docs", "text"),
+    )),
+    ("📣 FLOOR", (
+        ("staff-news", "Decisions the whole team follows. Guide+ read. Admin+ post.", "news", "text"),
+        ("staff-chat", "All staff. Short updates. Private things go in your owner channel.", "all", "text"),
+        ("staff-voice", "All staff. No recording without everyone in the call agreeing.", "guide", "voice"),
     )),
     ("🛟 RANKS", (
-        ("guide-chat", "Guides and up. Questions, shadowing, and small cases.", "guide"),
-        ("mod-chat", "Mods and up. Kicks, tempbans, and cases a guide should hand over.", "mod"),
-        ("admin-chat", "Admins and the owner. Permabans, rollbacks, and rank changes.", "admin"),
+        ("guide-chat", "Guides and up. Questions, shadowing, and cases inside a 1 hour mute.", "guide", "text"),
+        ("mod-chat", "Mods and up. Kicks, tempbans up to 7 days, and proof you are handing up.", "mod", "text"),
+        ("admin-chat", "Admins and the owner. Permabans, rollbacks, grants, and rank changes.", "admin", "text"),
     )),
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
-DOCS_MARKER = "tt-staff-docs=1"
+# Bumped when the handbook is rewritten, so an older post does not block the new one.
+DOC_VERSION = "v2"
 VENT_MARKER = "vent=1"
+ROOM_FOR_RANK = {
+    GUIDE_ROLE: "guide-chat",
+    MOD_ROLE: "mod-chat",
+    ADMIN_ROLE: "admin-chat",
+    OWNER_ROLE: "admin-chat",
+}
 
 # Same ladder as the public rules. Keep this the only copy.
 PUNISHMENT_LADDER = (
@@ -149,192 +169,383 @@ def _footer(embed: discord.Embed, guild_name: str, icon_url: str | None) -> disc
     return embed
 
 
-def staff_handbook_embeds(guild_name: str, icon_url: str | None = None) -> list[discord.Embed]:
-    """How staff act. Text comes from the public rules and the rank ladder."""
-    embeds: list[discord.Embed] = []
+def channel_docs_marker(logical: str) -> str:
+    return f"tt-staff-docs={DOC_VERSION}:{logical}"
 
-    intro = discord.Embed(
-        title="✦  How Tropical Tycoon staff act",
-        description=(
-            "This server is staff only. Players never see these channels.\n\n"
-            "The public rules (in-game `/rules` and the rules channel) are what players agreed to. "
-            "You enforce those rules, including their **spirit**, not a private set of your own.\n"
-            "Your rank is the ceiling. Doing more than your rank allows is a staff offence, "
-            "the same as a player breaking a rule.\n\n"
-            "Guide sees the guide rooms. Mod sees those plus the mod room. "
-            "Admin sees those plus the admin room. The owner sees every room, "
-            "including your private channel."
-        ),
-        colour=BRAND,
-    )
-    _footer(intro, guild_name, icon_url)
-    embeds.append(intro)
 
-    conduct = discord.Embed(
-        title="Before you punish",
-        description="Slow down. A wrong ban costs a player more than a slow one costs you.",
-        colour=GOLD,
-    )
-    conduct.add_field(
-        name="1. Proof first",
-        value="Clip, screenshot, or the time and IGN. No proof, no punishment, except a threat that is happening right now.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="2. Use the ladder",
-        value="Start at the first step for that rule. Repeat offences move one step up. Skip steps only for a severe case (threats, doxxing, cheats, duping).",
-        inline=False,
-    )
-    conduct.add_field(
-        name="3. Hand it up",
-        value="A guide stops at a 1 hour mute. A mod stops at a 7 day tempban. Permaban, rollback, and `/gens give` are admin. If you are unsure, ask in the rank channel or in your owner channel.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="4. Stay off your own case",
-        value="Friend, enemy, or someone you play with: pass the case to another staff member. Say that you did.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="5. Keep it private",
-        value="Don't post proof, igns of the punished, or the punishment in public chat or DMs. Players appeal with a ticket. One appeal per punishment.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="6. Tools are for cases",
-        value="Vanish, teleport, invsee, and jail are for an active case. Not for curiosity, not for your own island, not to impress anyone.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="7. No real-life info",
-        value="Never ask for, keep, or share someone's real name, address, photos, or account email. Phishing and doxxing are a permanent ban, including if a staff member does it.",
-        inline=False,
-    )
-    conduct.add_field(
-        name="8. Your channel with the owner",
-        value="Each of you has a channel only you and the owner can see. Use it to vent, ask for help, or flag a staff problem. Other staff cannot read it. Write in whatever language is easiest.",
-        inline=False,
-    )
-    _footer(conduct, guild_name, icon_url)
-    embeds.append(conduct)
+def docs_are_current(topic: str | None, logical: str) -> bool:
+    return channel_docs_marker(logical) in (topic or "")
 
-    ranks = discord.Embed(
-        title="What your rank may do in-game",
-        description=(
-            "LuckPerms track `staff`: **guide < mod < admin < owner**. "
-            "A higher rank can do everything the rank below it can do.\n"
-            "There is no `/warn` command. A warning is a message to the player, then you record it in staff chat."
-        ),
-        colour=TEAL,
-    )
-    ranks.add_field(
-        name="Guide",
-        value=(
-            "Mute up to **1 hour**. `/helpop` (the staff inbox), `/seen`, `/whois`, `/list`.\n"
-            "You do **not** kick, ban, vanish, or open inventories."
-        ),
-        inline=False,
-    )
-    ranks.add_field(
-        name="Mod",
-        value=(
-            "Kick. Mute of any length. Tempban up to **7 days** (`/tempban`). Vanish, `/tp`, `/tphere`.\n"
-            "Look at an inventory (`/invsee`) without changing it. Visit an island. `/togglejail` when you need someone to stay still.\n"
-            "CoreProtect lookup only. You do **not** permaban, roll back, or give items."
-        ),
-        inline=False,
-    )
-    ranks.add_field(
-        name="Admin",
-        value=(
-            "Permaban and unban. CoreProtect rollback and restore. Island reset, delete, or transfer.\n"
-            "`/gens give` and `/gens keys` (always with a reason; the server logs it). `/gens reload`.\n"
-            "You may add or remove **Guide** and **Mod** only. You cannot grant Admin or Owner."
-        ),
-        inline=False,
-    )
-    ranks.add_field(
-        name="Owner",
-        value="Everything, including creative, `/op`, and LuckPerms. Nobody else gets those.",
-        inline=False,
-    )
-    _footer(ranks, guild_name, icon_url)
-    embeds.append(ranks)
 
-    denied = discord.Embed(
-        title="Nobody below owner",
-        description="These stay off, even for admin. Don't ask a player to work around them.",
-        colour=PINK,
-    )
-    denied.add_field(
-        name="Blocked",
-        value=(
-            "Creative and other gamemodes. `/op` and `/deop`.\n"
-            "LuckPerms beyond adding or removing Guide and Mod.\n"
-            "Building on someone else's island with an admin bypass.\n"
-            "A guide mute longer than 1 hour, or a mod ban longer than 7 days. Hand those up."
+def highest_rank(role_names) -> str | None:
+    found = None
+    for name in RANK_ORDER:
+        if name in role_names:
+            found = name
+    return found
+
+
+def _room(mentions: dict | None, logical: str) -> str:
+    if mentions and mentions.get(logical):
+        return str(mentions[logical])
+    return f"#{logical}"
+
+
+def _embed(guild_name, icon_url, title, description, fields, colour) -> discord.Embed:
+    embed = discord.Embed(title=title, description=description or None, colour=colour)
+    for name, value in fields:
+        embed.add_field(name=name, value=value, inline=False)
+    return _footer(embed, guild_name, icon_url)
+
+
+def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: dict | None = None) -> dict:
+    """One list of embeds per handbook channel. Public rules and the rank ladder are the source."""
+    start = _room(mentions, "start-here")
+    boarding = _room(mentions, "onboarding")
+    conduct = _room(mentions, "conduct")
+    ranks = _room(mentions, "ranks")
+    ladder = _room(mentions, "ladder")
+    cases = _room(mentions, "cases")
+    appeals = _room(mentions, "appeals")
+    desk = _room(mentions, "desk")
+    news = _room(mentions, "staff-news")
+    chat = _room(mentions, "staff-chat")
+    voice = _room(mentions, "staff-voice")
+    guide = _room(mentions, "guide-chat")
+    mod = _room(mentions, "mod-chat")
+    admin = _room(mentions, "admin-chat")
+
+    sections = {
+        "start-here": [
+            _embed(
+                guild_name, icon_url,
+                "✦  Tropical Tycoon staff",
+                "This server is the staff workplace. Players are not in here, and nothing from here is copied into public chat.\n\n"
+                "The public rules, in-game `/rules` and the rules channel, are what players agreed to. "
+                "You enforce those rules, including their spirit. Your rank is the ceiling. "
+                "Going past it is a staff offence.",
+                [
+                    ("How the rooms work",
+                     f"{start} is this page. {boarding} is your first week.\n"
+                     f"The handbook is {conduct}, {ranks}, {ladder}, {cases}, {appeals}, and {desk}.\n"
+                     f"{news} is decisions. {chat} is the floor. {voice} is the call.\n"
+                     f"{guide}, {mod}, and {admin} are the rank rooms. A higher rank can see the rooms below. "
+                     "A lower rank cannot see the rooms above."),
+                    ("Your channel with the owner",
+                     "Every Guide, Mod, and Admin gets one channel that only they and the owner can see. "
+                     "Use it to speak freely, to ask before you punish, or to flag another staff member. "
+                     "The rest of the team cannot read it. Write in whatever language is easiest."),
+                    ("Read this order once",
+                     f"1. {boarding}\n2. {conduct}\n3. {ranks}\n4. {ladder}\n5. {cases}\n6. {appeals}\n7. {desk}\n"
+                     "Then say hello in the floor channel. Don't take a case before that."),
+                ],
+                BRAND,
+            ),
+        ],
+        "onboarding": [
+            _embed(
+                guild_name, icon_url,
+                "✦  Your first week",
+                "Do these before you mute, kick, or ban anyone. Watching is part of the job.",
+                [
+                    ("1. Read the handbook",
+                     f"In order: {conduct}, {ranks}, {ladder}, {cases}, {appeals}, {desk}. "
+                     "The ladder in here is the same table players see. Don't invent a shorter one."),
+                    ("2. Learn your ceiling",
+                     "Your private channel has the rank you were given and where it stops. "
+                     "A guide stops at a 1 hour mute. A mod stops at a 7 day tempban. "
+                     "Permanent bans, rollbacks, and `/gens give` are admin."),
+                    ("3. Say hello, then watch",
+                     f"Post in {chat} with your rank and the hours you are usually around. "
+                     f"Read {guide} for a few real cases before you take one. "
+                     "Ask how a decision was made. Don't undo it in public."),
+                    ("4. Two ranks that are easy to mix up",
+                     "Islander, Surfer, Captain, Tycoon, and Mogul are **store** ranks. They are not staff. "
+                     "A Captain cannot mute. A Guide is not a store rank and does not get store perks from the staff role."),
+                    ("5. When you are unsure",
+                     "Write it in your owner channel before you act. That is the point of the channel. "
+                     "Guessing a ban is worse than waiting an hour."),
+                ],
+                GOLD,
+            ),
+        ],
+        "handbook": [
+            _embed(
+                guild_name, icon_url,
+                "✦  Handbook",
+                "These channels are the staff copy of the public rules, plus how we work. "
+                "If a page and the public rules ever disagree, the public rules win and an admin fixes the page.",
+                [
+                    ("Conduct", f"{conduct} — proof, tone, conflicts, privacy, tools."),
+                    ("Ranks", f"{ranks} — what Guide, Mod, Admin, and Owner may do, and what stays off."),
+                    ("Ladder", f"{ladder} — every step, how a repeat is counted, and when you may skip."),
+                    ("Cases", f"{cases} — the note you write, and the situations that actually show up."),
+                    ("Appeals", f"{appeals} — reports, one appeal, refunds, and staying off your own case."),
+                    ("Desk", f"{desk} — tickets, public chat, voice, and which room a message belongs in."),
+                ],
+                BRAND,
+            ),
+        ],
+        "conduct": [
+            _embed(
+                guild_name, icon_url,
+                "✦  How staff act",
+                "A wrong punishment costs a player more than a slow one costs you. Slow down.",
+                [
+                    ("Proof first",
+                     "A clip, a screenshot, or the time and the IGN. A picture of the result, with no act and no time, is weak. "
+                     "No proof, no punishment, except a threat that is happening right now. Write the proof into the case note."),
+                    ("The ladder, not a mood",
+                     "Start at the first step of that rule. A repeat of the **same** rule moves one step. "
+                     "A different rule starts at its own first step. Skip ahead only for a severe case: threats, doxxing, cheats, duping."),
+                    ("Hand it up before you stretch",
+                     "A guide does not 'just this once' kick. A mod does not 'just this once' permaban. "
+                     f"The next rank is {guide}, then {mod}, then {admin}. Say what you already did and what you need."),
+                    ("Stay off your own case",
+                     "A friend, someone you play with, or someone you dislike: pass it on and say that you did. "
+                     "You can gather the clip. You don't choose the punishment."),
+                    ("Disagree in the rank room",
+                     f"If two of you read a case differently, the higher rank decides and writes it in that rank room. "
+                     f"Don't keep the argument in public chat, in a ticket, or in {chat}. "
+                     "The owner has the last word."),
+                    ("Privacy",
+                     "Don't post proof, the punished IGN, or the length in public chat or in DMs to players. "
+                     "Players appeal with a ticket. One appeal per punishment. "
+                     "Never ask for or keep a real name, address, photo, or email. Doing that is the permanent-ban rule, including for staff."),
+                    ("Tools are for the case in front of you",
+                     "Vanish, teleport, invsee, and jail are for an open case. Not for curiosity, not for your own island, not to show off. "
+                     "Look, write down what you needed, and leave."),
+                    ("Tone",
+                     "Short, calm, and specific. No sarcasm at a player, no pile-on in a ticket, no public argument with another staff member. "
+                     "If you need to vent, that is what your channel with the owner is for."),
+                ],
+                GOLD,
+            ),
+        ],
+        "ranks": [
+            _embed(
+                guild_name, icon_url,
+                "✦  What your rank may do",
+                "In-game track `staff`: **guide < mod < admin < owner**. A higher rank can do everything below it.\n"
+                "There is no `/warn` command. A warning is a message to the player, then a line in the case note.\n"
+                "Store ranks (Islander, Surfer, Captain, Tycoon, Mogul) are not on this track and are not staff.",
+                [
+                    ("Guide",
+                     "Mute up to **1 hour**. `/helpop` is the staff inbox. `/seen`, `/whois`, `/list`.\n"
+                     "You do **not** kick, ban, vanish, open an inventory, or give items. "
+                     "If the next step is past 1 hour, write the case and hand it to a mod."),
+                    ("Mod",
+                     "Kick. Mute of any length. Tempban up to **7 days** (`/tempban`). Vanish, `/tp`, `/tphere`.\n"
+                     "`/invsee` without changing the inventory. Visit an island. `/togglejail` when someone must stay still for the check.\n"
+                     "CoreProtect lookup only (`/co i`, `/co lookup`). You do **not** permaban, roll back, restore, or `/gens give`."),
+                    ("Admin",
+                     "Permaban and unban. CoreProtect rollback and restore. Island reset, delete, or transfer.\n"
+                     "`/gens give` and `/gens keys` only with a reason. The server logs it. `/gens reload`.\n"
+                     "You may add or remove **Guide** and **Mod** only. You cannot grant Admin or Owner, in Discord or in LuckPerms."),
+                    ("Owner",
+                     "Everything, including creative, `/op`, and LuckPerms. Nobody else gets those, and nobody asks a player to work around them."),
+                    ("Blocked below owner",
+                     "Creative and other gamemodes. `/op` and `/deop`.\n"
+                     "LuckPerms past Guide and Mod.\n"
+                     "Building on someone else's island with a bypass.\n"
+                     "A guide mute longer than 1 hour, or a mod ban longer than 7 days."),
+                    ("Discord rooms follow the same ceiling",
+                     f"Everyone reads {news}. Everyone talks in {chat} and joins {voice}.\n"
+                     f"{guide} is the guide floor. {mod} is hidden from guides. {admin} is hidden from guides and mods.\n"
+                     "Your private channel is not a rank room. Other staff never see it."),
+                ],
+                TEAL,
+            ),
+        ],
+        "ladder": [
+            _embed(
+                guild_name, icon_url,
+                "✦  Punishment ladder",
+                "Same table as the public rules. One step up each time the **same** rule happens again. "
+                "Severe cases can start higher: threats, doxxing, cheats, duping. "
+                "A first-time AFK-farming ban can be lifted on appeal if the player is honest. Don't promise that before the appeal is read.",
+                list(PUNISHMENT_LADDER[:11]),
+                PINK,
+            ),
+            _embed(
+                guild_name, icon_url,
+                "✦  Punishment ladder, continued",
+                "Write the step in the case note before you tell the player. IGN, rule, step, length, proof.",
+                list(PUNISHMENT_LADDER[11:]),
+                PINK,
+            ),
+        ],
+        "cases": [
+            _embed(
+                guild_name, icon_url,
+                "✦  How to write a case",
+                "If it is not written down, the next person will punish it again or undo it.\n\n"
+                "```\n"
+                "IGN:\n"
+                "Java or Bedrock:\n"
+                "Rule:\n"
+                "Ladder step:\n"
+                "Repeat of the same rule:\n"
+                "Length:\n"
+                "Proof:\n"
+                "Done so far:\n"
+                "Handed to:\n"
+                "```\n"
+                "Put that note in the rank room that matches who has to act, not in public chat.",
+                [
+                    ("Proof that holds",
+                     "A clip of the act, or a screenshot plus the time. Coords help for grief and dupes. "
+                     "A Bedrock name from Floodgate often starts with a dot. That dot alone is not impersonation."),
+                    ("Alts",
+                     "An alt used as an AFK island member is allowed. An alt used to dodge a punishment, or to take a reward twice, is ban evasion. "
+                     "Check `/seen` before you call it an alt."),
+                ],
+                BRAND,
+            ),
+            _embed(
+                guild_name, icon_url,
+                "✦  Situations",
+                "Handle the step your rank is allowed to finish. Hand the rest up with the note already filled in.",
+                [
+                    ("Spam, insults, staff disrespect",
+                     "A guide can do the warning and the mutes that stay inside 1 hour. "
+                     "Anything longer is a mod. Don't turn a chat warning into a ban because the player argued."),
+                    ("Harassment or hate",
+                     "Start the ladder. If it is targeted and ongoing, a mod takes the longer mute or the kick. "
+                     "Threats, doxxing, and slurs can start higher. A guide still does not ban."),
+                    ("Cheats or a hacked client",
+                     "First step is 7 days, which a mod may apply once the clip is real. 30 days and permanent are admin. "
+                     "Vanish and `/co lookup` are for the proof. Then stop."),
+                    ("Duping or exploiting",
+                     "The first step includes a rollback. Rollback is admin. A guide or mod saves the clip, the coords, and the time, and posts the note in admin chat. Don't delete the items yourself."),
+                    ("Scam, theft, grief",
+                     "A mod can do the 7 day step where the ladder starts there. Restore and a longer ban are admin. "
+                     "Tell the player staff cannot always refund a scam. Don't promise the items back."),
+                    ("Real-money trading or a chargeback",
+                     "Both go to admin. A chargeback is a permanent ban and the bought items come off, wherever they ended up. "
+                     "Don't negotiate it in a ticket."),
+                    ("Lost items, a bug, a store purchase",
+                     "This is not a punishment. Bug Report or Store Support, with the time or the Tebex order id. "
+                     "Guides and mods do not `/gens give`. Admin does, with a reason, and only when the proof is there."),
+                ],
+                GOLD,
+            ),
+        ],
+        "appeals": [
+            _embed(
+                guild_name, icon_url,
+                "✦  Reports and appeals",
+                "Players report. Staff decide. Nobody gets to punish a player from a public argument.",
+                [
+                    ("Reports",
+                     "In-game `/report`, or a Player Report ticket with a clip. "
+                     "Don't tell them to handle it themselves, and don't discuss the punishment in the ticket beyond what they need to appeal."),
+                    ("One appeal",
+                     "One Punishment Appeal ticket per punishment. The person who issued it does not decide the appeal. "
+                     "A higher rank, or someone who was not involved, reads it. Lying in the appeal moves them up the ladder."),
+                    ("What you may undo",
+                     "A first AFK-farming ban can be lifted if they are honest. Say that only after you have read the appeal. "
+                     "You don't shorten a ban in DMs, and you don't trade a shorter ban for anything."),
+                    ("Refunds are not appeals",
+                     "A crash, a rollback, or a bug needs the time and a screenshot, in a Bug Report. "
+                     "A store problem needs the Tebex order id in Store Support. "
+                     "A chargeback is not a refund request. It is a permanent ban."),
+                    ("A problem with staff",
+                     "Don't put it in the floor channel and don't take it to a player. "
+                     "Write it in your channel with the owner. If you are the one being accused, step off the case."),
+                    ("Leaving the team",
+                     "When the staff role comes off, the private channel closes for you and stays for the owner. "
+                     "The history is kept. The rank rooms disappear with the role."),
+                ],
+                BRAND,
+            ),
+        ],
+        "desk": [
+            _embed(
+                guild_name, icon_url,
+                "✦  The desk",
+                "Public Discord stays in English. This staff server, and your channel with the owner, can be whatever language is easiest.",
+                [
+                    ("Tickets",
+                     "Player Report, General Support, Bug Report, Store Support, Punishment Appeal. "
+                     "One ticket per issue, with the IGN. Claim puts your name on the channel. "
+                     "`/close request` asks the player before a timed close. The Close button still closes it immediately. "
+                     "Don't ping them to hurry, and don't punish them for opening the ticket."),
+                    ("Which room",
+                     f"{news} — a decision the whole team must follow. Admin writes it.\n"
+                     f"{chat} — a short update: who has a case, who is around.\n"
+                     f"{voice} — talk it through. No recording unless everyone in the call agrees.\n"
+                     f"{guide} {mod} {admin} — the case note, in the lowest room whose rank can finish it.\n"
+                     "Your owner channel — doubt, a hard shift, or another staff member."),
+                    ("Public chat",
+                     "The public rules on Discord still apply to you. No drama about a punishment. "
+                     "No proof posted for the audience. If a player argues, point them at a Punishment Appeal and stop."),
+                    ("In-game inbox",
+                     "`/helpop` is how players reach staff in game. Answer it, or say in the floor channel that you have it. "
+                     "Don't leave it sitting because it wasn't a Discord ticket."),
+                ],
+                TEAL,
+            ),
+        ],
+    }
+    return sections
+
+
+def staff_handbook_embeds(guild_name: str, icon_url: str | None = None, mentions: dict | None = None) -> list[discord.Embed]:
+    """Every handbook embed, in room order. Used by tests and by a full refresh."""
+    sections = handbook_sections(guild_name, icon_url, mentions)
+    ordered = []
+    for _, channels in STAFF_LAYOUT:
+        for logical, _topic, mode, kind in channels:
+            if mode == "docs" and kind == "text":
+                ordered.extend(sections.get(logical, []))
+    return ordered
+
+
+def rank_brief_embed(guild_name: str, icon_url: str | None, rank: str) -> discord.Embed:
+    briefs = {
+        GUIDE_ROLE: (
+            "You are a Guide.",
+            "You can mute up to **1 hour**, and you can use `/helpop`, `/seen`, `/whois`, and `/list`.\n"
+            "You cannot kick, ban, vanish, open an inventory, or give items. "
+            "If a case needs more than that, write the note and hand it to a mod.\n"
+            "Read the handbook before your first mute.",
         ),
-        inline=False,
-    )
-    denied.add_field(
-        name="First-time AFK-farming",
-        value="The public rules allow one lift on appeal if the player is honest. Don't promise it before the appeal is read.",
-        inline=False,
-    )
-    _footer(denied, guild_name, icon_url)
-    embeds.append(denied)
-
-    ladder = discord.Embed(
-        title="Punishment ladder",
-        description=(
-            "Same table as the public rules. Go up one step each time it happens again. "
-            "Severe cases can start higher. Write the step you used in staff chat: IGN, rule, length, proof."
+        MOD_ROLE: (
+            "You are a Mod.",
+            "You can kick, mute without the 1 hour cap, and tempban up to **7 days**. "
+            "Vanish, teleport, read-only `/invsee`, island visits, `/togglejail`, and CoreProtect lookup are yours.\n"
+            "You cannot permaban, roll back, restore, or `/gens give`. Those go to admin with the case note already written.",
         ),
-        colour=PINK,
+        ADMIN_ROLE: (
+            "You are an Admin.",
+            "You can permaban, unban, roll back, restore, reset or transfer an island, and `/gens give` or `/gens keys` with a reason.\n"
+            "You may add or remove Guide and Mod only. You cannot grant Admin or Owner, and you still have no creative and no `/op`.",
+        ),
+        OWNER_ROLE: (
+            "You have the Owner role.",
+            "The owner rank is the only one with creative, `/op`, and full LuckPerms. "
+            "Use the rank rooms for decisions the team must see, and leave people their private channel.",
+        ),
+    }
+    title, body = briefs.get(rank, ("Your rank", "Read the ranks channel before you act."))
+    return _embed(
+        guild_name, icon_url,
+        f"✦  {title}",
+        body + "\n\nThis channel stays between you and the owner. Other staff cannot read it.",
+        [],
+        BRAND,
     )
-    for name, value in PUNISHMENT_LADDER[:12]:
-        ladder.add_field(name=name, value=value, inline=False)
-    _footer(ladder, guild_name, icon_url)
-    embeds.append(ladder)
-
-    ladder2 = discord.Embed(title="Punishment ladder (continued)", colour=PINK)
-    for name, value in PUNISHMENT_LADDER[12:]:
-        ladder2.add_field(name=name, value=value, inline=False)
-    _footer(ladder2, guild_name, icon_url)
-    embeds.append(ladder2)
-
-    report = discord.Embed(
-        title="Reports, appeals, leaving the team",
-        colour=BRAND,
-    )
-    report.add_field(
-        name="Reports",
-        value="Players use in-game `/report` or a Player Report ticket. You don't tell them to handle it themselves, and you don't argue the case in public chat.",
-        inline=False,
-    )
-    report.add_field(
-        name="Appeals",
-        value="One Punishment Appeal ticket per punishment. Lying in an appeal moves them up the ladder. You don't shorten a punishment in DMs.",
-        inline=False,
-    )
-    report.add_field(
-        name="If you step down",
-        value="Your private channel closes for you and stays for the owner, so the history isn't lost. Rank rooms disappear with the role.",
-        inline=False,
-    )
-    _footer(report, guild_name, icon_url)
-    embeds.append(report)
-    return embeds
 
 
 def vent_welcome_embed(guild_name: str, icon_url: str | None) -> discord.Embed:
     embed = discord.Embed(
         title="✦  Your channel with the owner",
         description=(
-            "Only you and the owner can see this. The other guides, mods, and admins cannot.\n\n"
-            "Use it to get something off your chest, ask for help on a case, "
-            "or say something you don't want in staff chat.\n"
-            "Write in whatever language is easiest. Nothing you say here is forwarded."
+            "Only you and the owner can see this. Guides, mods, and admins cannot.\n\n"
+            "Use it to get something off your chest, to ask before you punish, "
+            "or to flag another staff member. Don't use it to skip the ladder or to ask for a punishment you could hand to the right rank.\n"
+            "Write in whatever language is easiest. Nothing here is copied to the team."
         ),
         colour=BRAND,
     )
@@ -345,12 +556,13 @@ def _icon_url(guild) -> str | None:
     return guild.icon.url if guild.icon else None
 
 
-def find_named(guild, logical_name: str):
+def find_named(guild, logical_name: str, kind: str = "text"):
     """Exact name, then slug match (🌴-staff-chat → staff-chat)."""
-    exact = discord.utils.get(guild.text_channels, name=logical_name)
+    pool = guild.voice_channels if kind == "voice" else guild.text_channels
+    exact = discord.utils.get(pool, name=logical_name)
     if exact is not None:
         return exact
-    for channel in guild.text_channels:
+    for channel in pool:
         slug = channel_slug(channel.name)
         if slug == logical_name or slug.endswith("-" + logical_name):
             return channel
@@ -407,7 +619,7 @@ async def ensure_category(guild, name: str):
     return category, True
 
 
-async def apply_rank_mode(channel, guild, mode: str):
+async def apply_rank_mode(channel, guild, mode: str, kind: str = "text"):
     view_min = _MODE_VIEW[mode]
     send_min = _MODE_SEND[mode]
     await channel.set_permissions(
@@ -424,6 +636,16 @@ async def apply_rank_mode(channel, guild, mode: str):
             await channel.set_permissions(role, overwrite=None, reason="staff discord: clear lower rank")
             continue
         can_send = rank_at_least(name, send_min)
+        if kind == "voice":
+            await channel.set_permissions(
+                role,
+                view_channel=True,
+                connect=can_send,
+                speak=can_send,
+                stream=can_send,
+                reason="staff discord: voice access",
+            )
+            continue
         await channel.set_permissions(
             role,
             view_channel=True,
@@ -437,16 +659,16 @@ async def apply_rank_mode(channel, guild, mode: str):
         )
 
 
-async def post_handbook(channel, guild, force: bool) -> bool:
-    topic = channel.topic or ""
-    if DOCS_MARKER in topic and not force:
+async def post_channel_docs(channel, guild, logical: str, sections: dict, base_topic: str, force: bool) -> bool:
+    embeds = sections.get(logical) or []
+    if not embeds:
         return False
-    icon = _icon_url(guild)
-    for embed in staff_handbook_embeds(guild.name, icon):
+    if docs_are_current(channel.topic, logical) and not force:
+        return False
+    for embed in embeds:
         await channel.send(embed=embed)
-    base = topic.replace(DOCS_MARKER, "").strip(" ;")
-    new_topic = f"{base}; {DOCS_MARKER}".strip("; ") if base else DOCS_MARKER
-    await channel.edit(topic=new_topic[:1024], reason="staff discord: handbook posted")
+    marker = channel_docs_marker(logical)
+    await channel.edit(topic=f"{base_topic}; {marker}"[:1024], reason="staff discord: handbook posted")
     return True
 
 
@@ -520,9 +742,28 @@ async def open_vent(guild, member) -> str:
             reason="staff discord: staff member can speak here",
         )
     if created:
-        await channel.send(content=member.mention, embed=vent_welcome_embed(guild.name, _icon_url(guild)))
+        icon = _icon_url(guild)
+        await channel.send(content=member.mention, embed=vent_welcome_embed(guild.name, icon))
+        rank = highest_rank({role.name for role in member.roles})
+        if rank is not None:
+            await channel.send(embed=rank_brief_embed(guild.name, icon, rank))
         return "created"
     return "open"
+
+
+async def announce_rank(guild, member, rank: str, include_brief: bool) -> None:
+    """Tell the rank room. The private channel gets the ceiling when it is a new rank."""
+    if include_brief and rank is not None:
+        private = find_vent(guild, member.id)
+        if private is not None:
+            await private.send(embed=rank_brief_embed(guild.name, _icon_url(guild), rank))
+    room_name = ROOM_FOR_RANK.get(rank)
+    room = find_named(guild, room_name) if room_name else None
+    if room is not None:
+        await room.send(
+            f"{member.mention} is now **{rank}**. The ceiling is in their channel with the owner. "
+            "Read the handbook before you act past it."
+        )
 
 
 async def close_vent(guild, member) -> str:
@@ -559,25 +800,42 @@ async def sync_staff_guild(bot, force_docs: bool = False) -> str | None:
     for name, colour, hoist in ROLE_SPECS:
         await ensure_role(guild, name, colour, hoist)
 
-    docs_channel = None
+    placed = []
     for category_name, channels in STAFF_LAYOUT:
         category, _ = await ensure_category(guild, category_name)
-        for logical, topic, mode in channels:
-            channel = find_named(guild, logical)
+        for logical, topic, mode, kind in channels:
+            channel = find_named(guild, logical, kind)
             if channel is None:
-                channel = await guild.create_text_channel(
-                    logical,
-                    category=category,
-                    topic=topic,
-                    reason="staff discord: create channel",
-                )
+                if kind == "voice":
+                    channel = await guild.create_voice_channel(
+                        logical,
+                        category=category,
+                        reason="staff discord: create voice",
+                    )
+                else:
+                    channel = await guild.create_text_channel(
+                        logical,
+                        category=category,
+                        topic=topic,
+                        reason="staff discord: create channel",
+                    )
+            elif kind == "text":
+                # Keep a posted handbook marker. A brand-new channel still has the plain topic.
+                keep = channel.topic if docs_are_current(channel.topic, logical) else (channel.topic or topic)
+                await channel.edit(category=category, topic=keep, reason="staff discord: place channel")
             else:
-                await channel.edit(category=category, topic=channel.topic or topic, reason="staff discord: place channel")
-            await apply_rank_mode(channel, guild, mode)
-            if logical == "handbook":
-                docs_channel = channel
-    if docs_channel is not None:
-        await post_handbook(docs_channel, guild, force_docs)
+                await channel.edit(category=category, reason="staff discord: place voice")
+            await apply_rank_mode(channel, guild, mode, kind)
+            placed.append((logical, topic, mode, kind, channel))
+
+    mentions = {logical: channel.mention for logical, _topic, _mode, kind, channel in placed if kind == "text"}
+    sections = handbook_sections(guild.name, _icon_url(guild), mentions)
+    posted = 0
+    for logical, topic, mode, kind, channel in placed:
+        if mode != "docs" or kind != "text":
+            continue
+        if await post_channel_docs(channel, guild, logical, sections, topic, force_docs):
+            posted += 1
 
     opened = 0
     if bot.intents.members:
@@ -588,8 +846,12 @@ async def sync_staff_guild(bot, force_docs: bool = False) -> str | None:
                     opened += 1
     else:
         print("staff discord: DISCORD_PRIVILEGED_INTENTS=1 is required for private channels", flush=True)
-    print(f"staff discord: ready on {guild.name}, private channels checked: {opened}", flush=True)
-    return f"ready ({opened} private channels)"
+    print(
+        f"staff discord: ready on {guild.name}, handbook pages posted: {posted}, "
+        f"private channels checked: {opened}",
+        flush=True,
+    )
+    return f"ready ({posted} handbook pages, {opened} private channels)"
 
 
 def setup(bot) -> None:
@@ -615,9 +877,10 @@ def setup(bot) -> None:
             lines = ["**Staff server preview** (nothing changed).", ""]
             for category_name, channels in STAFF_LAYOUT:
                 bits = []
-                for logical, _, mode in channels:
-                    found = find_named(guild, logical)
-                    bits.append(f"{found.mention if found else '`#' + logical + '` missing'} ({mode})")
+                for logical, _, mode, kind in channels:
+                    found = find_named(guild, logical, kind)
+                    label = found.mention if found else f"`#{logical}` missing"
+                    bits.append(f"{label} ({mode})")
                 lines.append(f"**{category_name}** — " + ", ".join(bits))
             lines.append("")
             lines.append(f"**{VENT_CATEGORY}** — one private channel per Guide, Mod, Admin, and Owner (not you).")
@@ -648,9 +911,15 @@ def setup(bot) -> None:
             return
         was = holds_team_role(before_names, after.id, after.guild.owner_id)
         now = holds_team_role(after_names, after.id, after.guild.owner_id)
+        before_rank = highest_rank(before_names)
+        after_rank = highest_rank(after_names)
         try:
             if not was and now:
-                await open_vent(after.guild, after)
+                status = await open_vent(after.guild, after)
+                if after_rank is not None:
+                    await announce_rank(after.guild, after, after_rank, include_brief=status != "created")
+            elif was and now and before_rank != after_rank and after_rank is not None:
+                await announce_rank(after.guild, after, after_rank, include_brief=True)
             elif was and not now:
                 await close_vent(after.guild, after)
         except discord.Forbidden:
