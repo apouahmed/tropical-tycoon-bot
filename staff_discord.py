@@ -606,15 +606,40 @@ async def ensure_role(guild, name: str, colour: discord.Colour, hoist: bool):
     return role, True
 
 
+def _bot_overwrite() -> discord.PermissionOverwrite:
+    return discord.PermissionOverwrite(
+        view_channel=True,
+        send_messages=True,
+        read_message_history=True,
+        manage_channels=True,
+        attach_files=True,
+        embed_links=True,
+    )
+
+
+async def _keep_bot_access(channel) -> None:
+    """Grant the bot before @everyone is denied, or the next edit is Missing Access."""
+    me = channel.guild.me
+    if me is None:
+        return
+    await channel.set_permissions(me, overwrite=_bot_overwrite(), reason="staff discord: bot keeps access")
+
+
 async def ensure_category(guild, name: str):
     category = find_category(guild, name)
     if category is not None:
+        await _keep_bot_access(category)
+        await category.set_permissions(
+            guild.default_role,
+            view_channel=False,
+            reason="staff discord: hide category",
+        )
         return category, False
-    category = await guild.create_category(name, reason="staff discord: create category")
-    await category.set_permissions(
-        guild.default_role,
-        view_channel=False,
-        reason="staff discord: hide category",
+    overwrites = {guild.default_role: discord.PermissionOverwrite(view_channel=False)}
+    if guild.me is not None:
+        overwrites[guild.me] = _bot_overwrite()
+    category = await guild.create_category(
+        name, overwrites=overwrites, reason="staff discord: create category"
     )
     return category, True
 
@@ -622,6 +647,7 @@ async def ensure_category(guild, name: str):
 async def apply_rank_mode(channel, guild, mode: str, kind: str = "text"):
     view_min = _MODE_VIEW[mode]
     send_min = _MODE_SEND[mode]
+    await _keep_bot_access(channel)
     await channel.set_permissions(
         guild.default_role,
         view_channel=False,
@@ -715,6 +741,8 @@ async def open_vent(guild, member) -> str:
                 read_message_history=True,
                 manage_messages=True,
             )
+        if guild.me is not None:
+            overwrites[guild.me] = _bot_overwrite()
         name = vent_channel_name(member.display_name)
         if discord.utils.get(guild.text_channels, name=name) is not None:
             name = f"{name}-{str(member.id)[-4:]}"[:100]

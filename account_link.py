@@ -20,6 +20,38 @@ import staff_actions
 import staff_manage
 
 LINKS_PATH = Path(__file__).with_name("links.json")
+
+
+def bot_channel_overwrite() -> discord.PermissionOverwrite:
+    """Keep the bot able to see a channel after @everyone is denied.
+
+    Manage Channels does not beat an @everyone deny. The next edit then
+    returns Missing Access (50001).
+    """
+    return discord.PermissionOverwrite(
+        view_channel=True,
+        send_messages=True,
+        read_message_history=True,
+        manage_channels=True,
+        attach_files=True,
+        embed_links=True,
+    )
+
+
+async def keep_bot_access(channel) -> None:
+    me = channel.guild.me
+    if me is None:
+        return
+    await channel.set_permissions(
+        me,
+        view_channel=True,
+        send_messages=True,
+        read_message_history=True,
+        manage_channels=True,
+        attach_files=True,
+        embed_links=True,
+        reason="keep bot access before hiding the channel",
+    )
 _book = rank_sync.LinkDirectory()
 _save_lock = asyncio.Lock()
 
@@ -436,6 +468,7 @@ async def ensure_rank_rooms(guild: discord.Guild) -> list[str]:
                 edits["topic"] = room.topic
             if edits:
                 await channel.edit(reason="Tropical Tycoon rank channel", **edits)
+        await keep_bot_access(channel)
         await channel.set_permissions(
             everyone, view_channel=False, send_messages=False, reason="rank channel hidden"
         )
@@ -492,6 +525,12 @@ def start_loop(bot: discord.Client) -> None:
                 await ensure_rank_rooms(guild)
             except discord.HTTPException as e:
                 print(f"Rank rooms failed in {guild.name}: {e}", flush=True)
+                if getattr(e, "code", None) == 50001:
+                    print(
+                        "Missing Access: a hidden channel already blocks the bot. "
+                        "Turn Administrator on for the bot role, restart once, then it can be turned off.",
+                        flush=True,
+                    )
         while not bot.is_closed():
             await asyncio.sleep(minutes * 60)
             try:

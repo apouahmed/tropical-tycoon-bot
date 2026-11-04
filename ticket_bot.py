@@ -415,6 +415,7 @@ async def apply_channel_mode(channel, mode, everyone, staff_roles, mod_roles):
                 reason="setupdiscord: staff chat powers",
             )
     elif mode == "staff":
+        await account_link.keep_bot_access(channel)
         await channel.set_permissions(everyone, view_channel=False, reason="setupdiscord: staff-only")
         for role in staff_roles:
             await channel.set_permissions(
@@ -425,6 +426,7 @@ async def apply_channel_mode(channel, mode, everyone, staff_roles, mod_roles):
                 reason="setupdiscord: Guide+ staff chat",
             )
     elif mode == "transcripts":
+        await account_link.keep_bot_access(channel)
         await channel.set_permissions(everyone, view_channel=False, reason="setupdiscord: transcripts hidden")
         for role in mod_roles:
             await channel.set_permissions(
@@ -967,7 +969,10 @@ async def create_ticket(interaction, key, reason, extra=None):
 
     category = discord.utils.get(guild.categories, name=cat_name)
     if category is None:
-        cat_overwrites = {guild.default_role: discord.PermissionOverwrite(view_channel=False)}
+        cat_overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            guild.me: account_link.bot_channel_overwrite(),
+        }
         for staff in staff_list:
             cat_overwrites[staff] = discord.PermissionOverwrite(view_channel=True)
         category = await guild.create_category(cat_name, overwrites=cat_overwrites)
@@ -1775,6 +1780,12 @@ async def on_ready():
         await staff_discord.sync_staff_guild(bot)
     except Exception as exc:
         print(f"staff discord sync failed: {exc}", flush=True)
+        if getattr(exc, "code", None) == 50001:
+            print(
+                "Missing Access: a hidden channel already blocks the bot. "
+                "Turn Administrator on for the bot role, restart once, then it can be turned off.",
+                flush=True,
+            )
 
 
 if __name__ == "__main__":
