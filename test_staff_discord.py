@@ -60,8 +60,12 @@ class StaffDiscordTests(unittest.TestCase):
             "chargeback",
             "/gens give",
             "Creative and other gamemodes",
+            "no `/co lookup`",
         ):
             self.assertIn(phrase.lower(), blob.lower(), phrase)
+        self.assertNotIn("coreprotect", blob.lower())
+        self.assertNotIn("/co i", blob.lower())
+        self.assertNotIn("/co rollback", blob.lower())
         self.assertIn("<#1>", blob)
         for embed in embeds:
             self.assertLessEqual(len(embed), 6000, embed.title)

@@ -66,12 +66,12 @@ STAFF_LAYOUT = (
     ("🛟 RANKS", (
         ("guide-chat", "Guides and up. Questions, shadowing, and cases inside a 1 hour mute.", "guide", "text"),
         ("mod-chat", "Mods and up. Kicks, tempbans up to 7 days, and proof you are handing up.", "mod", "text"),
-        ("admin-chat", "Admins and the owner. Permabans, rollbacks, grants, and rank changes.", "admin", "text"),
+        ("admin-chat", "Admins and the owner. Permabans, item corrections, and rank changes.", "admin", "text"),
     )),
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
 # Bumped when the handbook is rewritten, so an older post does not block the new one.
-DOC_VERSION = "v2"
+DOC_VERSION = "v3"
 VENT_MARKER = "vent=1"
 ROOM_FOR_RANK = {
     GUIDE_ROLE: "guide-chat",
@@ -94,9 +94,9 @@ PUNISHMENT_LADDER = (
     ("Personal info / phishing", "Permanent ban"),
     ("Macro, autoclicker, AFK-farming", "1d ban → 3d ban → 7d ban → 30d ban"),
     ("Cheats / hacked client", "7d ban → 30d ban → Permanent ban"),
-    ("Bug abuse", "Warning + rollback → 1d ban → 7d ban → Permanent ban"),
-    ("Duping / exploiting", "7d ban + rollback → Permanent ban"),
-    ("Griefing", "1d ban + restore → 3d ban → 7d ban → Permanent ban"),
+    ("Bug abuse", "Warning, items removed → 1d ban → 7d ban → Permanent ban"),
+    ("Duping / exploiting", "7d ban, items removed → Permanent ban"),
+    ("Griefing", "1d ban → 3d ban → 7d ban → Permanent ban"),
     ("Stealing", "Warning + return items → 1d ban → 3d ban → 7d+ ban"),
     ("Scamming", "7d ban → Permanent ban"),
     ("Real-money trading", "7d ban + item removal → Permanent ban"),
@@ -254,7 +254,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                     ("2. Learn your ceiling",
                      "Your private channel has the rank you were given and where it stops. "
                      "A guide stops at a 1 hour mute. A mod stops at a 7 day tempban. "
-                     "Permanent bans, rollbacks, and `/gens give` are admin."),
+                     "Permanent bans and `/gens give` are admin. This server has no `/co` lookup or rollback."),
                     ("3. Say hello, then watch",
                      f"Post in {chat} with your rank and the hours you are usually around. "
                      f"Read {guide} for a few real cases before you take one. "
@@ -337,10 +337,11 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                     ("Mod",
                      "Kick. Mute of any length. Tempban up to **7 days** (`/tempban`). Vanish, `/tp`, `/tphere`.\n"
                      "`/invsee` without changing the inventory. Visit an island. `/togglejail` when someone must stay still for the check.\n"
-                     "CoreProtect lookup only (`/co i`, `/co lookup`). You do **not** permaban, roll back, restore, or `/gens give`."),
+                     "Proof is a clip, a screenshot, and the time. There is no `/co lookup`. You do **not** permaban or `/gens give`."),
                     ("Admin",
-                     "Permaban and unban. CoreProtect rollback and restore. Island reset, delete, or transfer.\n"
+                     "Permaban and unban. Island reset, delete, or transfer.\n"
                      "`/gens give` and `/gens keys` only with a reason. The server logs it. `/gens reload`.\n"
+                     "There is no block logger. If items have to come off or go back, use the island tools or a logged `/gens` grant.\n"
                      "You may add or remove **Guide** and **Mod** only. You cannot grant Admin or Owner, in Discord or in LuckPerms."),
                     ("Owner",
                      "Everything, including creative, `/op`, and LuckPerms. Nobody else gets those, and nobody asks a player to work around them."),
@@ -415,12 +416,13 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "Threats, doxxing, and slurs can start higher. A guide still does not ban."),
                     ("Cheats or a hacked client",
                      "First step is 7 days, which a mod may apply once the clip is real. 30 days and permanent are admin. "
-                     "Vanish and `/co lookup` are for the proof. Then stop."),
+                     "Vanish is for watching them. The clip is the proof. Then stop."),
                     ("Duping or exploiting",
-                     "The first step includes a rollback. Rollback is admin. A guide or mod saves the clip, the coords, and the time, and posts the note in admin chat. Don't delete the items yourself."),
+                     "There is no rollback command. A guide or mod saves the clip, the coords, and the time, and posts the note in admin chat. "
+                     "Admin takes the items off. Don't delete them yourself."),
                     ("Scam, theft, grief",
-                     "A mod can do the 7 day step where the ladder starts there. Restore and a longer ban are admin. "
-                     "Tell the player staff cannot always refund a scam. Don't promise the items back."),
+                     "A mod can do the 7 day step where the ladder starts there. A longer ban is admin. "
+                     "Tell the player staff cannot always return a scam or a grief. Don't promise the items back."),
                     ("Real-money trading or a chargeback",
                      "Both go to admin. A chargeback is a permanent ban and the bought items come off, wherever they ended up. "
                      "Don't negotiate it in a ticket."),
@@ -447,7 +449,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "A first AFK-farming ban can be lifted if they are honest. Say that only after you have read the appeal. "
                      "You don't shorten a ban in DMs, and you don't trade a shorter ban for anything."),
                     ("Refunds are not appeals",
-                     "A crash, a rollback, or a bug needs the time and a screenshot, in a Bug Report. "
+                     "A crash or a bug needs the time and a screenshot, in a Bug Report. "
                      "A store problem needs the Tebex order id in Store Support. "
                      "A chargeback is not a refund request. It is a permanent ban."),
                     ("A problem with staff",
@@ -514,12 +516,14 @@ def rank_brief_embed(guild_name: str, icon_url: str | None, rank: str) -> discor
         MOD_ROLE: (
             "You are a Mod.",
             "You can kick, mute without the 1 hour cap, and tempban up to **7 days**. "
-            "Vanish, teleport, read-only `/invsee`, island visits, `/togglejail`, and CoreProtect lookup are yours.\n"
-            "You cannot permaban, roll back, restore, or `/gens give`. Those go to admin with the case note already written.",
+            "Vanish, teleport, read-only `/invsee`, island visits, and `/togglejail` are yours. "
+            "Proof is a clip and the time. There is no `/co lookup`.\n"
+            "You cannot permaban or `/gens give`. Those go to admin with the case note already written.",
         ),
         ADMIN_ROLE: (
             "You are an Admin.",
-            "You can permaban, unban, roll back, restore, reset or transfer an island, and `/gens give` or `/gens keys` with a reason.\n"
+            "You can permaban, unban, reset or transfer an island, and `/gens give` or `/gens keys` with a reason. "
+            "There is no block logger.\n"
             "You may add or remove Guide and Mod only. You cannot grant Admin or Owner, and you still have no creative and no `/op`.",
         ),
         OWNER_ROLE: (
@@ -685,12 +689,26 @@ async def apply_rank_mode(channel, guild, mode: str, kind: str = "text"):
         )
 
 
+async def _clear_own_messages(channel) -> None:
+    me = channel.guild.me
+    if me is None:
+        return
+    async for message in channel.history(limit=50):
+        if message.author.id != me.id:
+            continue
+        try:
+            await message.delete()
+        except discord.HTTPException:
+            pass
+
+
 async def post_channel_docs(channel, guild, logical: str, sections: dict, base_topic: str, force: bool) -> bool:
     embeds = sections.get(logical) or []
     if not embeds:
         return False
     if docs_are_current(channel.topic, logical) and not force:
         return False
+    await _clear_own_messages(channel)
     for embed in embeds:
         await channel.send(embed=embed)
     marker = channel_docs_marker(logical)
