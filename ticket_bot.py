@@ -617,7 +617,7 @@ def rules_embeds(guild):
         colour=BRAND,
     )
     report.add_field(name="1. Report",
-                     value="In-game `/report`, or open a **Player Report** ticket with a clip or screenshot.",
+                     value="Use `/report` in-game. It sends you here to open a **Player Report** ticket with a clip or screenshot.",
                      inline=False)
     report.add_field(name="2. Appeal",
                      value="Open a **Punishment Appeal** ticket. Be honest: lying in an appeal makes it worse.",
@@ -846,7 +846,7 @@ def faq_embeds(guild):
             ("Where do I get help?",
              f"• Questions: {questions}\n"
              f"• Bugs: a Bug Report ticket in {tickets}, with a screenshot or clip\n"
-             f"• Rule breakers: `/report` in-game, or a Player Report ticket\n"
+             f"• Rule breakers: `/report` in-game, then open the Player Report ticket on this Discord\n"
              f"• Punishments: a Punishment Appeal ticket\n"
              f"• Rules: {rules}"),
         ]),

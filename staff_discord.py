@@ -75,7 +75,7 @@ STAFF_LAYOUT = (
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
 # Bumped when the handbook is rewritten, so an older post does not block the new one.
-DOC_VERSION = "v5"
+DOC_VERSION = "v6"
 VENT_MARKER = "vent=1"
 ROOM_FOR_RANK = {
     GUIDE_ROLE: "guide-chat",
@@ -455,8 +455,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                 "Players report. Staff decide. Nobody gets to punish a player from a public argument.",
                 [
                     ("Reports",
-                     "In-game `/report`, or a Player Report ticket with a clip. "
-                     "Don't tell them to handle it themselves, and don't discuss the punishment in the ticket beyond what they need to appeal."),
+                     "Tell the player to use `/report`. That sends them to the main Discord to open a Player Report ticket, with a clip.\n"
+                     "You handle that ticket. Don't take the report in game chat, and don't discuss the punishment in the ticket beyond what they need to appeal."),
                     ("One appeal",
                      "One Punishment Appeal ticket per punishment. The person who issued it does not decide the appeal. "
                      "A higher rank, or someone who was not involved, reads it. Lying in the appeal moves them up the ladder."),
@@ -484,6 +484,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                 "Public Discord stays in English. This staff server, and your channel with the owner, can be whatever language is easiest.",
                 [
                     ("Tickets",
+                     "A player report starts with `/report` in-game. That opens a ticket on the main Discord.\n"
                      "Player Report, General Support, Bug Report, Store Support, Punishment Appeal. "
                      "One ticket per issue, with the IGN. Claim puts your name on the channel. "
                      "`/close request` asks the player before a timed close. The Close button still closes it immediately. "

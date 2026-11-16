@@ -61,6 +61,8 @@ class StaffDiscordTests(unittest.TestCase):
             "/gens give",
             "Creative and other gamemodes",
             "/duty",
+            "/report",
+            "main Discord",
         ):
             self.assertIn(phrase.lower(), blob.lower(), phrase)
         for absent in ("coreprotect", "/co", "jail", "essentials", "rollback"):
