@@ -63,6 +63,10 @@ STAFF_LAYOUT = (
         ("staff-chat", "All staff. Short updates. Private things go in your owner channel.", "all", "text"),
         ("staff-voice", "All staff. No recording without everyone in the call agreeing.", "guide", "voice"),
     )),
+    ("⏱️ DUTY", (
+        ("on-duty", "Who is on duty right now. One message, kept by the bot.", "board", "text"),
+        ("duty-log", "Clock in, clock out, and how long that shift was. Admin and Owner.", "audit", "text"),
+    )),
     ("🛟 RANKS", (
         ("guide-chat", "Guides and up. Questions, shadowing, and cases inside a 1 hour mute.", "guide", "text"),
         ("mod-chat", "Mods and up. Kicks, tempbans up to 7 days, and proof you are handing up.", "mod", "text"),
@@ -71,7 +75,7 @@ STAFF_LAYOUT = (
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
 # Bumped when the handbook is rewritten, so an older post does not block the new one.
-DOC_VERSION = "v3"
+DOC_VERSION = "v4"
 VENT_MARKER = "vent=1"
 ROOM_FOR_RANK = {
     GUIDE_ROLE: "guide-chat",
@@ -111,16 +115,20 @@ _MODE_VIEW = {
     "docs": GUIDE_ROLE,
     "all": GUIDE_ROLE,
     "guide": GUIDE_ROLE,
+    "board": GUIDE_ROLE,
     "mod": MOD_ROLE,
     "admin": ADMIN_ROLE,
+    "audit": ADMIN_ROLE,
 }
 _MODE_SEND = {
     "news": ADMIN_ROLE,
     "docs": ADMIN_ROLE,
     "all": GUIDE_ROLE,
     "guide": GUIDE_ROLE,
+    "board": OWNER_ROLE,
     "mod": MOD_ROLE,
     "admin": ADMIN_ROLE,
+    "audit": OWNER_ROLE,
 }
 
 
@@ -214,6 +222,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
     guide = _room(mentions, "guide-chat")
     mod = _room(mentions, "mod-chat")
     admin = _room(mentions, "admin-chat")
+    on_duty = _room(mentions, "on-duty")
+    duty_log = _room(mentions, "duty-log")
 
     sections = {
         "start-here": [
@@ -229,6 +239,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      f"{start} is this page. {boarding} is your first week.\n"
                      f"The handbook is {conduct}, {ranks}, {ladder}, {cases}, {appeals}, and {desk}.\n"
                      f"{news} is decisions. {chat} is the floor. {voice} is the call.\n"
+                     f"{on_duty} shows who is working. {duty_log} is the shift record.\n"
                      f"{guide}, {mod}, and {admin} are the rank rooms. A higher rank can see the rooms below. "
                      "A lower rank cannot see the rooms above."),
                     ("Your channel with the owner",
@@ -253,8 +264,9 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "The ladder in here is the same table players see. Don't invent a shorter one."),
                     ("2. Learn your ceiling",
                      "Your private channel has the rank you were given and where it stops. "
-                     "A guide stops at a 1 hour mute. A mod stops at a 7 day tempban. "
-                     "Permanent bans and `/gens give` are admin. This server has no `/co` lookup or rollback."),
+                     "Go on duty with `/duty` before any `/staff` action. "
+                     "A guide stops at a **1 day** mute or ban. A mod stops at **7 days**. "
+                     "Permanent bans, refunds, and `/staff item` are admin. This server has no `/co` and no jail."),
                     ("3. Say hello, then watch",
                      f"Post in {chat} with your rank and the hours you are usually around. "
                      f"Read {guide} for a few real cases before you take one. "
@@ -313,8 +325,9 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "Players appeal with a ticket. One appeal per punishment. "
                      "Never ask for or keep a real name, address, photo, or email. Doing that is the permanent-ban rule, including for staff."),
                     ("Tools are for the case in front of you",
-                     "Vanish, teleport, invsee, and jail are for an open case. Not for curiosity, not for your own island, not to show off. "
-                     "Look, write down what you needed, and leave."),
+                     "`/staff tp`, `/staff tphere`, vanish, and invsee are for an open case. "
+                     "Not for curiosity, not for your own island, not to show off. "
+                     "Look, write down what you needed, and leave. You have to be on duty."),
                     ("Tone",
                      "Short, calm, and specific. No sarcasm at a player, no pile-on in a ticket, no public argument with another staff member. "
                      "If you need to vent, that is what your channel with the owner is for."),
@@ -327,29 +340,35 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                 guild_name, icon_url,
                 "✦  What your rank may do",
                 "In-game track `staff`: **guide < mod < admin < owner**. A higher rank can do everything below it.\n"
-                "There is no `/warn` command. A warning is a message to the player, then a line in the case note.\n"
+                "`/staff warn` is the warning. It needs a reason, and you have to be on duty.\n"
                 "Store ranks (Islander, Surfer, Captain, Tycoon, Mogul) are not on this track and are not staff.",
                 [
                     ("Guide",
-                     "Mute up to **1 hour**. `/helpop` is the staff inbox. `/seen`, `/whois`, `/list`.\n"
-                     "You do **not** kick, ban, vanish, open an inventory, or give items. "
-                     "If the next step is past 1 hour, write the case and hand it to a mod."),
+                     "`/duty` first. Mute and ban up to **1 day**, only with `/staff mute` and `/staff ban`.\n"
+                     "`/staff tp`, `/staff tphere`, `/staff warn`, `/staff note`, `/staff history`, `/staff lookup`.\n"
+                     "`/helpop`, `/seen`, `/whois`, `/list`.\n"
+                     "You do **not** kick, vanish, open an inventory, unmute, unban, or give items. "
+                     "A step longer than 1 day goes to a mod."),
                     ("Mod",
-                     "Kick. Mute of any length. Tempban up to **7 days** (`/tempban`). Vanish, `/tp`, `/tphere`.\n"
-                     "`/invsee` without changing the inventory. Visit an island. `/togglejail` when someone must stay still for the check.\n"
-                     "Proof is a clip, a screenshot, and the time. There is no `/co lookup`. You do **not** permaban or `/gens give`."),
+                     "Kick. Mute and ban up to **7 days**, still only with `/staff mute` and `/staff ban`.\n"
+                     "`/staff vanish` and `/staff invsee` (look, don't take). "
+                     "`/island admin show` and `/island admin teleport` when nobody is on the island.\n"
+                     "You do **not** permaban, unmute, unban, refund, or `/staff item`. "
+                     "Essentials `/tp`, `/tphere`, `/mute`, and `/tempban` are not yours. There is no `/co` and no jail."),
                     ("Admin",
-                     "Permaban and unban. Island reset, delete, or transfer.\n"
-                     "`/gens give` and `/gens keys` only with a reason. The server logs it. `/gens reload`.\n"
-                     "There is no block logger. If items have to come off or go back, use the island tools or a logged `/gens` grant.\n"
-                     "You may add or remove **Guide** and **Mod** only. You cannot grant Admin or Owner, in Discord or in LuckPerms."),
+                     "Permanent mute and ban. `/staff unmute` and `/staff unban`.\n"
+                     "`/staff refund` and `/staff item`, with a reason. "
+                     "`/gens give`, `/gens keys`, `/gens xp`, `/gens booster`, and `/pets give` are logged.\n"
+                     "Move an island leader. Add or remove **Guide** and **Mod** only. "
+                     "You cannot grant Admin or Owner, and you still have no creative and no `/op`."),
                     ("Owner",
-                     "Everything, including creative, `/op`, and LuckPerms. Nobody else gets those, and nobody asks a player to work around them."),
+                     "Creative, `/op`, LuckPerms, `/gens wipe`, the store and expedition tools, Tebex, `/hub set`, and `/warp set`.\n"
+                     "Disbanding an island, purging it, or resetting the world stays here."),
                     ("Blocked below owner",
-                     "Creative and other gamemodes. `/op` and `/deop`.\n"
-                     "LuckPerms past Guide and Mod.\n"
-                     "Building on someone else's island with a bypass.\n"
-                     "A guide mute longer than 1 hour, or a mod ban longer than 7 days."),
+                     "A guide punishment longer than 1 day. A mod punishment longer than 7 days.\n"
+                     "Essentials mute, ban, kick, vanish, `/tp`, and `/tphere`. Those skip duty.\n"
+                     "Jail and `/co` are not on this server.\n"
+                     "Creative and other gamemodes. `/op` and LuckPerms past Guide and Mod."),
                     ("Discord rooms follow the same ceiling",
                      f"Everyone reads {news}. Everyone talks in {chat} and joins {voice}.\n"
                      f"{guide} is the guide floor. {mod} is hidden from guides. {admin} is hidden from guides and mods.\n"
@@ -409,11 +428,11 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                 "Handle the step your rank is allowed to finish. Hand the rest up with the note already filled in.",
                 [
                     ("Spam, insults, staff disrespect",
-                     "A guide can do the warning and the mutes that stay inside 1 hour. "
-                     "Anything longer is a mod. Don't turn a chat warning into a ban because the player argued."),
+                     "A guide can do the warning and the mutes and bans that stay inside 1 day. "
+                     "Anything longer is a mod. Don't stretch a chat warning because the player argued."),
                     ("Harassment or hate",
-                     "Start the ladder. If it is targeted and ongoing, a mod takes the longer mute or the kick. "
-                     "Threats, doxxing, and slurs can start higher. A guide still does not ban."),
+                     "Start the ladder. A guide can mute or ban up to 1 day. A longer step is a mod. "
+                     "Threats, doxxing, and slurs can start higher."),
                     ("Cheats or a hacked client",
                      "First step is 7 days, which a mod may apply once the clip is real. 30 days and permanent are admin. "
                      "Vanish is for watching them. The clip is the proof. Then stop."),
@@ -485,6 +504,9 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                     ("In-game inbox",
                      "`/helpop` is how players reach staff in game. Answer it, or say in the floor channel that you have it. "
                      "Don't leave it sitting because it wasn't a Discord ticket."),
+                    ("Duty",
+                     f"`/duty` starts and ends the shift. Every `/staff` action refuses while you are off duty.\n"
+                     f"{on_duty} shows who is working right now. {duty_log} records the clock-in, the clock-out, and how long the shift was."),
                 ],
                 TEAL,
             ),
@@ -508,22 +530,23 @@ def rank_brief_embed(guild_name: str, icon_url: str | None, rank: str) -> discor
     briefs = {
         GUIDE_ROLE: (
             "You are a Guide.",
-            "You can mute up to **1 hour**, and you can use `/helpop`, `/seen`, `/whois`, and `/list`.\n"
-            "You cannot kick, ban, vanish, open an inventory, or give items. "
-            "If a case needs more than that, write the note and hand it to a mod.\n"
-            "Read the handbook before your first mute.",
+            "Go on duty with `/duty` first. You can mute and ban up to **1 day** with `/staff mute` and `/staff ban`, "
+            "and you can use `/staff tp`, `/staff tphere`, `/staff warn`, `/helpop`, `/seen`, `/whois`, and `/list`.\n"
+            "You cannot kick, vanish, open an inventory, or give items. "
+            "If a case needs more than 1 day, write the note and hand it to a mod.\n"
+            "Read the handbook before your first punishment.",
         ),
         MOD_ROLE: (
             "You are a Mod.",
-            "You can kick, mute without the 1 hour cap, and tempban up to **7 days**. "
-            "Vanish, teleport, read-only `/invsee`, island visits, and `/togglejail` are yours. "
-            "Proof is a clip and the time. There is no `/co lookup`.\n"
-            "You cannot permaban or `/gens give`. Those go to admin with the case note already written.",
+            "You can kick, and mute or ban up to **7 days** with `/staff mute` and `/staff ban`. "
+            "`/staff vanish`, `/staff tp`, `/staff tphere`, and read-only `/staff invsee` are yours. "
+            "Proof is a clip and the time. There is no `/co` and no jail.\n"
+            "You cannot permaban, unmute, unban, or give items. Those go to admin with the case note already written.",
         ),
         ADMIN_ROLE: (
             "You are an Admin.",
-            "You can permaban, unban, reset or transfer an island, and `/gens give` or `/gens keys` with a reason. "
-            "There is no block logger.\n"
+            "You can permaban, unmute, unban, refund, and `/staff item`. "
+            "`/gens give`, `/gens keys`, `/gens xp`, and `/gens booster` need a reason. The server logs them.\n"
             "You may add or remove Guide and Mod only. You cannot grant Admin or Owner, and you still have no creative and no `/op`.",
         ),
         OWNER_ROLE: (
@@ -558,6 +581,51 @@ def vent_welcome_embed(guild_name: str, icon_url: str | None) -> discord.Embed:
 
 def _icon_url(guild) -> str | None:
     return guild.icon.url if guild.icon else None
+
+
+def channel_matches(name: str, logical: str) -> bool:
+    slug = channel_slug(name)
+    return slug == logical or slug.endswith("-" + logical)
+
+
+def keep_index(rows: list[tuple[int, bool]]) -> int:
+    """Pick the channel to keep. Prefer one that already holds the handbook, else the oldest id."""
+    if not rows:
+        raise ValueError("rows")
+    best = 0
+    for index, (channel_id, has_docs) in enumerate(rows):
+        best_id, best_docs = rows[best]
+        if has_docs and not best_docs:
+            best = index
+        elif has_docs == best_docs and channel_id < best_id:
+            best = index
+    return best
+
+
+_DUTY_ON = re.compile(r"^\*\*(.+?)\*\* went on duty \(([^)]+)\)\.$")
+_DUTY_OFF = re.compile(r"^\*\*(.+?)\*\* went off duty \(([^)]+)\)")
+
+
+def duty_roster(lines: list[str]) -> dict[str, str]:
+    """Replay clock-in and clock-out lines. The same name on two servers keeps the latest server."""
+    roster: dict[str, str] = {}
+    for line in lines:
+        text = (line or "").strip()
+        started = _DUTY_ON.match(text)
+        if started:
+            roster[started.group(1)] = started.group(2)
+            continue
+        stopped = _DUTY_OFF.match(text)
+        if stopped:
+            roster.pop(stopped.group(1), None)
+    return roster
+
+
+def roster_text(roster: dict[str, str]) -> str:
+    if not roster:
+        return "Nobody is on duty."
+    lines = [f"**{name}** — {server}" for name, server in sorted(roster.items(), key=lambda item: item[0].lower())]
+    return "On duty now:\n" + "\n".join(lines)
 
 
 def find_named(guild, logical_name: str, kind: str = "text"):
@@ -629,8 +697,54 @@ async def _keep_bot_access(channel) -> None:
     await channel.set_permissions(me, overwrite=_bot_overwrite(), reason="staff discord: bot keeps access")
 
 
+async def collapse_duplicates(guild, logical: str, kind: str):
+    """Keep one channel for this room and delete the extras."""
+    pool = guild.voice_channels if kind == "voice" else guild.text_channels
+    matches = [channel for channel in pool if channel_matches(channel.name, logical)]
+    if len(matches) <= 1:
+        return matches[0] if matches else None
+    rows = [
+        (channel.id, kind == "text" and docs_are_current(channel.topic, logical))
+        for channel in matches
+    ]
+    chosen = keep_index(rows)
+    keep = matches[chosen]
+    for index, channel in enumerate(matches):
+        if index == chosen:
+            continue
+        try:
+            await channel.delete(reason="staff discord: remove duplicate channel")
+        except discord.HTTPException as exc:
+            print(f"staff discord: could not remove duplicate #{channel.name} ({exc})", flush=True)
+    return keep
+
+
+async def collapse_categories(guild, name: str):
+    """Keep one category of this name. Move rooms out of the extras, then delete those."""
+    wanted = channel_slug(name)
+    matches = [category for category in guild.categories if channel_slug(category.name) == wanted]
+    if len(matches) <= 1:
+        return matches[0] if matches else None
+    keep = min(matches, key=lambda category: category.id)
+    for extra in matches:
+        if extra.id == keep.id:
+            continue
+        for child in list(extra.channels):
+            try:
+                await child.edit(category=keep, reason="staff discord: merge duplicate category")
+            except discord.HTTPException as exc:
+                print(f"staff discord: could not move #{child.name} ({exc})", flush=True)
+        try:
+            await extra.delete(reason="staff discord: remove duplicate category")
+        except discord.HTTPException as exc:
+            print(f"staff discord: could not remove duplicate category {extra.name} ({exc})", flush=True)
+    return keep
+
+
 async def ensure_category(guild, name: str):
-    category = find_category(guild, name)
+    category = await collapse_categories(guild, name)
+    if category is None:
+        category = find_category(guild, name)
     if category is not None:
         await _keep_bot_access(category)
         await category.set_permissions(
@@ -827,6 +941,62 @@ async def close_vent(guild, member) -> str:
     return "closed"
 
 
+async def connect_duty_log(guild) -> None:
+    """Create the duty webhook and hand it to the skyblock console. The URL is not printed."""
+    channel = find_named(guild, "duty-log")
+    if channel is None:
+        return
+    hook = None
+    try:
+        for item in await channel.webhooks():
+            if item.name == "Duty" and item.token:
+                hook = item
+                break
+        if hook is None:
+            hook = await channel.create_webhook(name="Duty", reason="staff discord: duty log")
+    except discord.HTTPException as exc:
+        print(f"staff discord: duty webhook was not created ({exc})", flush=True)
+        return
+    import rcon_client
+
+    try:
+        answer = rcon_client.execute("staff dutyhook " + hook.url)
+    except Exception as exc:
+        print(f"staff discord: duty log is on Discord, server connect failed ({exc.__class__.__name__})", flush=True)
+        return
+    if "connected" not in (answer or "").lower():
+        print("staff discord: the server did not confirm the duty log", flush=True)
+        return
+    print("staff discord: duty log connected to the server", flush=True)
+
+
+async def refresh_roster(guild) -> None:
+    """Rebuild #on-duty from the recent duty log. One bot message, replaced when it changes."""
+    log = find_named(guild, "duty-log")
+    board = find_named(guild, "on-duty")
+    if board is None or guild.me is None:
+        return
+    lines: list[str] = []
+    if log is not None:
+        try:
+            async for message in log.history(limit=200, oldest_first=True):
+                if message.content:
+                    lines.append(message.content)
+        except discord.HTTPException as exc:
+            print(f"staff discord: could not read the duty log ({exc})", flush=True)
+            return
+    text = roster_text(duty_roster(lines))
+    existing = None
+    async for message in board.history(limit=15):
+        if message.author.id == guild.me.id:
+            existing = message
+            break
+    if existing is None:
+        await board.send(text)
+    elif existing.content != text:
+        await existing.edit(content=text)
+
+
 async def sync_staff_guild(bot, force_docs: bool = False) -> str | None:
     """Idempotent setup for the staff server. None when that server isn't connected."""
     guild = bot.get_guild(STAFF_GUILD_ID)
@@ -850,7 +1020,7 @@ async def sync_staff_guild(bot, force_docs: bool = False) -> str | None:
     for category_name, channels in STAFF_LAYOUT:
         category, _ = await ensure_category(guild, category_name)
         for logical, topic, mode, kind in channels:
-            channel = find_named(guild, logical, kind)
+            channel = await collapse_duplicates(guild, logical, kind)
             if channel is None:
                 if kind == "voice":
                     channel = await guild.create_voice_channel(
@@ -892,6 +1062,8 @@ async def sync_staff_guild(bot, force_docs: bool = False) -> str | None:
                     opened += 1
     else:
         print("staff discord: DISCORD_PRIVILEGED_INTENTS=1 is required for private channels", flush=True)
+    await connect_duty_log(guild)
+    await refresh_roster(guild)
     print(
         f"staff discord: ready on {guild.name}, handbook pages posted: {posted}, "
         f"private channels checked: {opened}",
@@ -972,3 +1144,15 @@ def setup(bot) -> None:
             print(f"staff discord: could not update private channel for {after.id}", flush=True)
 
     bot.add_listener(on_member_update, "on_member_update")
+
+    async def on_message(message: discord.Message):
+        if message.guild is None or not is_staff_guild(message.guild) or not message.content:
+            return
+        if not channel_matches(message.channel.name, "duty-log"):
+            return
+        try:
+            await refresh_roster(message.guild)
+        except discord.HTTPException as exc:
+            print(f"staff discord: duty board was not updated ({exc})", flush=True)
+
+    bot.add_listener(on_message, "on_message")

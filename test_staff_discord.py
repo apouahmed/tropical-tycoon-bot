@@ -50,7 +50,7 @@ class StaffDiscordTests(unittest.TestCase):
             for embed in embeds
         )
         for phrase in (
-            "1 hour",
+            "1 day",
             "7 days",
             "Store ranks",
             "Islander",
@@ -60,7 +60,7 @@ class StaffDiscordTests(unittest.TestCase):
             "chargeback",
             "/gens give",
             "Creative and other gamemodes",
-            "no `/co lookup`",
+            "no `/co`",
         ):
             self.assertIn(phrase.lower(), blob.lower(), phrase)
         self.assertNotIn("coreprotect", blob.lower())
@@ -87,19 +87,36 @@ class StaffDiscordTests(unittest.TestCase):
         for required in (
             "start-here", "onboarding", "handbook", "conduct", "ranks", "ladder",
             "cases", "appeals", "desk", "staff-news", "staff-chat", "staff-voice",
-            "guide-chat", "mod-chat", "admin-chat",
+            "guide-chat", "mod-chat", "admin-chat", "on-duty", "duty-log",
         ):
             self.assertIn(required, names)
         self.assertEqual(dict(rooms)["staff-voice"], "voice")
         self.assertFalse(staff.docs_are_current("tt-staff-docs=1", "conduct"))
         self.assertTrue(staff.docs_are_current(staff.channel_docs_marker("conduct"), "conduct"))
+        self.assertEqual(staff._MODE_VIEW["audit"], "Admin")
+        self.assertEqual(staff._MODE_SEND["audit"], "Owner")
+        self.assertEqual(staff._MODE_VIEW["board"], "Guide")
+        self.assertTrue(staff.channel_matches("duty-log", "duty-log"))
+        self.assertTrue(staff.channel_matches("🌴-duty-log", "duty-log"))
+        self.assertFalse(staff.channel_matches("guide-chat", "duty-log"))
+        self.assertEqual(staff.keep_index([(20, False), (5, True), (4, False)]), 1)
+        self.assertEqual(staff.keep_index([(20, False), (5, False)]), 1)
+        roster = staff.duty_roster([
+            "**Alex** went on duty (skyblock).",
+            "**Sam** went on duty (hub).",
+            "**Alex** went off duty (skyblock) after 2h 5m.",
+        ])
+        self.assertEqual(roster, {"Sam": "hub"})
+        self.assertIn("**Sam**", staff.roster_text(roster))
+        self.assertEqual(staff.roster_text({}), "Nobody is on duty.")
 
     def test_highest_rank_and_brief(self):
         self.assertIsNone(staff.highest_rank(["Member", "Islander"]))
         self.assertEqual(staff.highest_rank(["Guide", "Mod"]), "Mod")
         self.assertEqual(staff.highest_rank(["Admin", "Guide"]), "Admin")
         brief = staff.rank_brief_embed("Tropical Tycoon", None, "Guide")
-        self.assertIn("1 hour", brief.description)
+        self.assertIn("1 day", brief.description)
+        self.assertIn("/staff tphere", brief.description)
         self.assertNotIn("permaban", brief.description.lower())
         mod = staff.rank_brief_embed("Tropical Tycoon", None, "Mod")
         self.assertIn("7 days", mod.description)
