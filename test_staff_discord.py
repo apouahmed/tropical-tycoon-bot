@@ -88,7 +88,7 @@ class StaffDiscordTests(unittest.TestCase):
         for required in (
             "start-here", "onboarding", "handbook", "conduct", "ranks", "ladder",
             "cases", "appeals", "desk", "staff-news", "staff-chat", "staff-voice",
-            "guide-chat", "mod-chat", "admin-chat", "on-duty", "duty-log",
+            "guide-chat", "mod-chat", "admin-chat", "on-duty", "duty-log", "punishments", "economy",
         ):
             self.assertIn(required, names)
         self.assertEqual(dict(rooms)["staff-voice"], "voice")
@@ -97,6 +97,10 @@ class StaffDiscordTests(unittest.TestCase):
         self.assertEqual(staff._MODE_VIEW["audit"], "Admin")
         self.assertEqual(staff._MODE_SEND["audit"], "Owner")
         self.assertEqual(staff._MODE_VIEW["board"], "Guide")
+        self.assertEqual(staff._MODE_VIEW["punishments"], "Guide")
+        self.assertEqual(staff._MODE_SEND["punishments"], "Owner")
+        self.assertEqual(dict(rooms)["economy"], "text")
+        self.assertEqual(dict(rooms)["punishments"], "text")
         self.assertTrue(staff.channel_matches("duty-log", "duty-log"))
         self.assertTrue(staff.channel_matches("🌴-duty-log", "duty-log"))
         self.assertFalse(staff.channel_matches("guide-chat", "duty-log"))

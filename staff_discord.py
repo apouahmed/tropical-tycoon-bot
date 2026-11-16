@@ -41,7 +41,7 @@ ROLE_SPECS = (
 )
 
 # (category, (logical name, topic, mode, kind)).
-# mode: news | docs | all | guide | mod | admin
+# mode: news | docs | all | guide | mod | admin | board | audit | punishments
 # kind: text | voice. A higher rank sees every room below it. No explicit deny on a
 # lower role, or someone who also holds the higher role would be locked out.
 STAFF_LAYOUT = (
@@ -66,6 +66,8 @@ STAFF_LAYOUT = (
     ("⏱️ DUTY", (
         ("on-duty", "Who is on duty right now. One message, kept by the bot.", "board", "text"),
         ("duty-log", "Clock in, clock out, and how long that shift was. Admin and Owner.", "audit", "text"),
+        ("punishments", "Warns, mutes, bans, kicks, unmutes, and unbans. Guide and up can read.", "punishments", "text"),
+        ("economy", "Refunds and item fixes. Admin and Owner.", "audit", "text"),
     )),
     ("🛟 RANKS", (
         ("guide-chat", "Guides and up. Questions, shadowing, and cases inside a 1 hour mute.", "guide", "text"),
@@ -75,7 +77,7 @@ STAFF_LAYOUT = (
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
 # Bumped when the handbook is rewritten, so an older post does not block the new one.
-DOC_VERSION = "v6"
+DOC_VERSION = "v7"
 VENT_MARKER = "vent=1"
 ROOM_FOR_RANK = {
     GUIDE_ROLE: "guide-chat",
@@ -119,6 +121,7 @@ _MODE_VIEW = {
     "mod": MOD_ROLE,
     "admin": ADMIN_ROLE,
     "audit": ADMIN_ROLE,
+    "punishments": GUIDE_ROLE,
 }
 _MODE_SEND = {
     "news": ADMIN_ROLE,
@@ -129,6 +132,7 @@ _MODE_SEND = {
     "mod": MOD_ROLE,
     "admin": ADMIN_ROLE,
     "audit": OWNER_ROLE,
+    "punishments": OWNER_ROLE,
 }
 
 
@@ -224,6 +228,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
     admin = _room(mentions, "admin-chat")
     on_duty = _room(mentions, "on-duty")
     duty_log = _room(mentions, "duty-log")
+    punishments = _room(mentions, "punishments")
+    economy = _room(mentions, "economy")
 
     sections = {
         "start-here": [
@@ -240,6 +246,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      f"The handbook is {conduct}, {ranks}, {ladder}, {cases}, {appeals}, and {desk}.\n"
                      f"{news} is decisions. {chat} is the floor. {voice} is the call.\n"
                      f"{on_duty} shows who is working. {duty_log} is the shift record.\n"
+                     f"{punishments} is every warn, mute, ban, kick, unmute, and unban.\n"
+                     f"{economy} is refunds and item fixes. Admin and Owner only.\n"
                      f"{guide}, {mod}, and {admin} are the rank rooms. A higher rank can see the rooms below. "
                      "A lower rank cannot see the rooms above."),
                     ("Your channel with the owner",
@@ -938,33 +946,46 @@ async def close_vent(guild, member) -> str:
     return "closed"
 
 
+# Channel, webhook name, console command. The URL is handed to the server and never printed.
+LOG_HOOKS = (
+    ("duty-log", "Duty", "staff dutyhook"),
+    ("punishments", "Punishments", "staff punishhook"),
+    ("economy", "Economy", "staff economyhook"),
+)
+
+
 async def connect_duty_log(guild) -> None:
-    """Create the duty webhook and hand it to the skyblock console. The URL is not printed."""
-    channel = find_named(guild, "duty-log")
-    if channel is None:
-        return
-    hook = None
-    try:
-        for item in await channel.webhooks():
-            if item.name == "Duty" and item.token:
-                hook = item
-                break
-        if hook is None:
-            hook = await channel.create_webhook(name="Duty", reason="staff discord: duty log")
-    except discord.HTTPException as exc:
-        print(f"staff discord: duty webhook was not created ({exc})", flush=True)
-        return
+    """Create the log webhooks and hand each URL to the skyblock console."""
     import rcon_client
 
-    try:
-        answer = rcon_client.execute("staff dutyhook " + hook.url)
-    except Exception as exc:
-        print(f"staff discord: duty log is on Discord, server connect failed ({exc.__class__.__name__})", flush=True)
-        return
-    if "connected" not in (answer or "").lower():
-        print("staff discord: the server did not confirm the duty log", flush=True)
-        return
-    print("staff discord: duty log connected to the server", flush=True)
+    for logical, hook_name, command in LOG_HOOKS:
+        channel = find_named(guild, logical)
+        if channel is None:
+            print(f"staff discord: #{logical} is missing", flush=True)
+            continue
+        try:
+            hook = None
+            for item in await channel.webhooks():
+                if item.name == hook_name and item.token:
+                    hook = item
+                    break
+            if hook is None:
+                hook = await channel.create_webhook(name=hook_name, reason="staff discord: log")
+        except discord.HTTPException as exc:
+            print(f"staff discord: {logical} webhook was not created ({exc})", flush=True)
+            continue
+        try:
+            answer = rcon_client.execute(command + " " + hook.url)
+        except Exception as exc:
+            print(
+                f"staff discord: {logical} is on Discord, server connect failed ({exc.__class__.__name__})",
+                flush=True,
+            )
+            continue
+        if "connected" not in (answer or "").lower():
+            print(f"staff discord: the server did not confirm {logical}", flush=True)
+            continue
+        print(f"staff discord: {logical} connected to the server", flush=True)
 
 
 async def refresh_roster(guild) -> None:
