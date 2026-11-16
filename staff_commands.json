@@ -94,6 +94,16 @@
         ]
       },
       {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
         "command": "/whois",
         "usage": "/whois <player>",
         "description": "Show a player's UUID, ban, mute and last logout.",
@@ -282,6 +292,16 @@
         "command": "/staff tp",
         "usage": "/staff tp <player>",
         "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
         "plugin": "SkyblockGens",
         "permission": "tycoon.staff.tp",
         "servers": [
@@ -637,6 +657,16 @@
         "command": "/staff tp",
         "usage": "/staff tp <player>",
         "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
         "plugin": "SkyblockGens",
         "permission": "tycoon.staff.tp",
         "servers": [
@@ -1328,6 +1358,16 @@
         "command": "/staff tp",
         "usage": "/staff tp <player>",
         "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
         "plugin": "SkyblockGens",
         "permission": "tycoon.staff.tp",
         "servers": [
