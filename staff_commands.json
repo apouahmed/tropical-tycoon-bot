@@ -1,0 +1,3162 @@
+{
+  "audited_at": "2026-11-16T11:23:00+01:00",
+  "source": "Live network read on 16 Nov 2026. Plugin jars, plugin.yml, the console help index, and LuckPerms. Nothing on Discord was changed.",
+  "ranks": {
+    "guide": [
+      {
+        "command": "/duty",
+        "usage": "/duty",
+        "description": "Go on or off duty. The staff tag shows only while you are on duty. A player must run it. Other /staff actions refuse you until you are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.duty",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff chat",
+        "usage": "/staff chat <message>",
+        "description": "Message other staff who are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.chat",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff warn",
+        "usage": "/staff warn <player> <reason>",
+        "description": "Record a warning on the player. This is the warning command. There is no /warn.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.warn",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff note",
+        "usage": "/staff note <player> <text>",
+        "description": "Add a staff note on a player. It does not punish them.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.note",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff mute",
+        "usage": "/staff mute <player> <time> <reason>",
+        "description": "Mute a player for up to 1 day.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.mute.1d",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff ban",
+        "usage": "/staff ban <player> <time> <reason>",
+        "description": "Ban a player for up to 1 day. The word permanent is refused at this rank.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.ban.1d",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff history",
+        "usage": "/staff history <player>",
+        "description": "Show the staff notes, warns, mutes and bans recorded for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.history",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff lookup",
+        "usage": "/staff lookup <player>",
+        "description": "Show a player's warn count, mute and ban at a glance.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.lookup",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tp",
+        "usage": "/staff tp <player>",
+        "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/whois",
+        "usage": "/whois <player>",
+        "description": "Show a player's UUID, ban, mute and last logout.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.whois",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mute",
+        "usage": "/mute <player> [time] [reason]",
+        "description": "Essentials mute. Config max-mute-time is -1, so this command has no time cap. Prefer /staff mute, which stops at 1 day for a Guide.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.mute",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/helpop",
+        "usage": "/helpop <message>",
+        "description": "Players can send this. Guide and above also have essentials.helpop.receive, so the message reaches you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.helpop.receive",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/plugins",
+        "usage": "/plugins",
+        "description": "List the plugins on this server.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.plugins",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/version",
+        "usage": "/version",
+        "description": "Show the server version.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.version",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/report",
+        "usage": "/report",
+        "description": "Tells the player to open a Discord ticket. It does not file a report and it does not ping staff.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/seen",
+        "usage": "/seen <player>",
+        "description": "Last logout, ban, mute and UUID. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.seen",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/list",
+        "usage": "/list",
+        "description": "Who is online. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "minecraft.command.list",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/rules",
+        "usage": "/rules",
+        "description": "Show the server rules.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      }
+    ],
+    "mod": [
+      {
+        "command": "/duty",
+        "usage": "/duty",
+        "description": "Go on or off duty. The staff tag shows only while you are on duty. A player must run it. Other /staff actions refuse you until you are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.duty",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff chat",
+        "usage": "/staff chat <message>",
+        "description": "Message other staff who are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.chat",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff warn",
+        "usage": "/staff warn <player> <reason>",
+        "description": "Record a warning on the player. This is the warning command. There is no /warn.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.warn",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff note",
+        "usage": "/staff note <player> <text>",
+        "description": "Add a staff note on a player. It does not punish them.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.note",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff mute",
+        "usage": "/staff mute <player> <time> <reason>",
+        "description": "Mute a player for up to 7 days.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.mute.7d",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff ban",
+        "usage": "/staff ban <player> <time> <reason>",
+        "description": "Ban a player for up to 7 days. Permanent is refused at this rank.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.ban.7d",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff history",
+        "usage": "/staff history <player>",
+        "description": "Show the staff notes, warns, mutes and bans recorded for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.history",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff lookup",
+        "usage": "/staff lookup <player>",
+        "description": "Show a player's warn count, mute and ban at a glance.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.lookup",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tp",
+        "usage": "/staff tp <player>",
+        "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/whois",
+        "usage": "/whois <player>",
+        "description": "Show a player's UUID, ban, mute and last logout.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.whois",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mute",
+        "usage": "/mute <player> [time] [reason]",
+        "description": "Essentials mute. Config max-mute-time is -1, so this command has no time cap. A Mod also has essentials.mute.unlimited. Prefer /staff mute when you want the rank cap recorded.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.mute",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/helpop",
+        "usage": "/helpop <message>",
+        "description": "Players can send this. Guide and above also have essentials.helpop.receive, so the message reaches you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.helpop.receive",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/plugins",
+        "usage": "/plugins",
+        "description": "List the plugins on this server.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.plugins",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/version",
+        "usage": "/version",
+        "description": "Show the server version.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.version",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/report",
+        "usage": "/report",
+        "description": "Tells the player to open a Discord ticket. It does not file a report and it does not ping staff.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/seen",
+        "usage": "/seen <player>",
+        "description": "Last logout, ban, mute and UUID. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.seen",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/list",
+        "usage": "/list",
+        "description": "Who is online. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "minecraft.command.list",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/rules",
+        "usage": "/rules",
+        "description": "Show the server rules.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/staff kick",
+        "usage": "/staff kick <player> <reason>",
+        "description": "Kick a player and record it. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.kick",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff vanish",
+        "usage": "/staff vanish",
+        "description": "Vanish yourself. Only a player can use it, and only while on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.vanish",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff invsee",
+        "usage": "/staff invsee <player>",
+        "description": "Open a read-only copy of an online player's inventory.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.invsee",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/kick",
+        "usage": "/kick <player> [reason]",
+        "description": "Essentials kick. minecraft.command.kick is granted as well.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.kick",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tempban",
+        "usage": "/tempban <player> <time> [reason]",
+        "description": "Essentials temporary ban, including offline players. Config max-tempban-time is -1, so there is no 7-day cap on this command. Use /staff ban when the 7-day cap must hold.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tempban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/vanish",
+        "usage": "/vanish [player] [on|off]",
+        "description": "Essentials vanish. You can also see vanished staff (essentials.vanish.see).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.vanish",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/invsee",
+        "usage": "/invsee <player>",
+        "description": "Essentials inventory view. essentials.invsee.preventmodify is set, so the inventory cannot be edited.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.invsee",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/enderchest",
+        "usage": "/enderchest [player]",
+        "description": "Open your ender chest, or another player's (essentials.enderchest.others).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.enderchest.others",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tp",
+        "usage": "/tp <player> [other]",
+        "description": "Essentials teleport. This is separate from /staff tp.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tp",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tphere",
+        "usage": "/tphere <player>",
+        "description": "Teleport a player to you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tphere",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/togglejail",
+        "usage": "/togglejail <player> <jail> [time]",
+        "description": "Send a player to a jail, or release them. A jail must already exist.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.togglejail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/setjail",
+        "usage": "/setjail <name>",
+        "description": "Create a jail where you are standing.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.setjail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/deljail",
+        "usage": "/deljail <name>",
+        "description": "Delete a jail. There is no /jail command.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.deljail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin show",
+        "usage": "/island admin show [player|island]",
+        "description": "Show information about an island. Alias /is admin show.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.show",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin teleport",
+        "usage": "/island admin teleport <player|island> [dimension]",
+        "description": "Visit an island. Bypass mode is denied at this rank. Alias /is admin teleport.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.teleport",
+        "servers": [
+          "skyblock"
+        ]
+      }
+    ],
+    "admin": [
+      {
+        "command": "/duty",
+        "usage": "/duty",
+        "description": "Go on or off duty. The staff tag shows only while you are on duty. A player must run it. Other /staff actions refuse you until you are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.duty",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff chat",
+        "usage": "/staff chat <message>",
+        "description": "Message other staff who are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.chat",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff warn",
+        "usage": "/staff warn <player> <reason>",
+        "description": "Record a warning on the player. This is the warning command. There is no /warn.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.warn",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff note",
+        "usage": "/staff note <player> <text>",
+        "description": "Add a staff note on a player. It does not punish them.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.note",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff mute",
+        "usage": "/staff mute <player> <time> <reason>",
+        "description": "Mute a player for any length.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.mute.unlimited",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff ban",
+        "usage": "/staff ban <player> <time> <reason>",
+        "description": "Ban a player, including a permanent ban.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.ban.permanent",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff history",
+        "usage": "/staff history <player>",
+        "description": "Show the staff notes, warns, mutes and bans recorded for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.history",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff lookup",
+        "usage": "/staff lookup <player>",
+        "description": "Show a player's warn count, mute and ban at a glance.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.lookup",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tp",
+        "usage": "/staff tp <player>",
+        "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/whois",
+        "usage": "/whois <player>",
+        "description": "Show a player's UUID, ban, mute and last logout.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.whois",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mute",
+        "usage": "/mute <player> [time] [reason]",
+        "description": "Essentials mute with no config time cap. Prefer /staff mute so the punishment is recorded.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.mute",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/helpop",
+        "usage": "/helpop <message>",
+        "description": "Players can send this. Guide and above also have essentials.helpop.receive, so the message reaches you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.helpop.receive",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/plugins",
+        "usage": "/plugins",
+        "description": "List the plugins on this server.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.plugins",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/version",
+        "usage": "/version",
+        "description": "Show the server version.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.version",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/report",
+        "usage": "/report",
+        "description": "Tells the player to open a Discord ticket. It does not file a report and it does not ping staff.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/seen",
+        "usage": "/seen <player>",
+        "description": "Last logout, ban, mute and UUID. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.seen",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/list",
+        "usage": "/list",
+        "description": "Who is online. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "minecraft.command.list",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/rules",
+        "usage": "/rules",
+        "description": "Show the server rules.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/staff kick",
+        "usage": "/staff kick <player> <reason>",
+        "description": "Kick a player and record it. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.kick",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff vanish",
+        "usage": "/staff vanish",
+        "description": "Vanish yourself. Only a player can use it, and only while on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.vanish",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff invsee",
+        "usage": "/staff invsee <player>",
+        "description": "Open a read-only copy of an online player's inventory.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.invsee",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/kick",
+        "usage": "/kick <player> [reason]",
+        "description": "Essentials kick. minecraft.command.kick is granted as well.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.kick",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tempban",
+        "usage": "/tempban <player> <time> [reason]",
+        "description": "Essentials temporary ban, including offline players. Config max-tempban-time is -1, so there is no 7-day cap on this command. Use /staff ban when the 7-day cap must hold.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tempban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/vanish",
+        "usage": "/vanish [player] [on|off]",
+        "description": "Essentials vanish. You can also see vanished staff (essentials.vanish.see).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.vanish",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/invsee",
+        "usage": "/invsee <player>",
+        "description": "Essentials inventory view. essentials.invsee.preventmodify is set, so the inventory cannot be edited.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.invsee",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/enderchest",
+        "usage": "/enderchest [player]",
+        "description": "Open your ender chest, or another player's (essentials.enderchest.others).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.enderchest.others",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tp",
+        "usage": "/tp <player> [other]",
+        "description": "Essentials teleport. This is separate from /staff tp.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tp",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tphere",
+        "usage": "/tphere <player>",
+        "description": "Teleport a player to you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tphere",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/togglejail",
+        "usage": "/togglejail <player> <jail> [time]",
+        "description": "Send a player to a jail, or release them. A jail must already exist.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.togglejail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/setjail",
+        "usage": "/setjail <name>",
+        "description": "Create a jail where you are standing.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.setjail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/deljail",
+        "usage": "/deljail <name>",
+        "description": "Delete a jail. There is no /jail command.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.deljail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin show",
+        "usage": "/island admin show [player|island]",
+        "description": "Show information about an island. Alias /is admin show.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.show",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin teleport",
+        "usage": "/island admin teleport <player|island> [dimension]",
+        "description": "Visit an island. Bypass mode is denied at this rank. Alias /is admin teleport.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.teleport",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff unmute",
+        "usage": "/staff unmute <player>",
+        "description": "Remove a staff mute.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.unmute",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff unban",
+        "usage": "/staff unban <player>",
+        "description": "Remove a staff ban.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.unban",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff refund",
+        "usage": "/staff refund <player> coins|keys <amount> tx:<id> <reason>",
+        "description": "Refund coins or keys once per transaction id. Gens, pets and ore use their own commands.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.refund",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff item",
+        "usage": "/staff item <player> <rod|fish|barrel|totem|pickaxe|gem|relic|hoe> ... <reason>",
+        "description": "Give a fishing, mining or quest item. Rods are 1-10. Hoes take a material and a level 1-5. Skyblock only.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.item",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/ban",
+        "usage": "/ban <player> [reason]",
+        "description": "Essentials permanent ban, including offline players.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.ban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/unban",
+        "usage": "/unban <player>",
+        "description": "Essentials unban. minecraft.command.pardon is granted as well.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.unban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens reload",
+        "usage": "/gens reload",
+        "description": "Reload SkyblockGens config, menus, scoreboard and warps.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.reload",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens give",
+        "usage": "/gens give <player> gen <tier> [amount] <reason> [txId] | collector <level> [amount] <reason> [txId] | wand <multiplier> <uses|unlimited> [amount] <reason> [txId] | gencore <I-VII|era> [amount] <reason> [txId] | hoe netherite <reason> [txId] | rod <1-10> [amount] <reason> [txId] | catalyst <3|5> [amount] <reason> [txId] | relic <locket|coin|chart> [amount] <reason> [txId]",
+        "description": "Give a gen, collector, wand, core, hoe, rod, catalyst or relic. A reason or tx id is required and the grant is audited.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.give",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens keys",
+        "usage": "/gens keys <player> [mystery|monthly] <1-1000> <reason> [txId]",
+        "description": "Grant mystery or monthly crate keys. A reason or tx id is required and the grant is audited.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.keys",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens store",
+        "usage": "/gens store <player> <rank> [txId]",
+        "description": "Set a player's store rank. Do not use this to fix a Tebex purchase by hand. Use /storeadmin.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.store",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens xp",
+        "usage": "/gens xp <player> <1-100000000>",
+        "description": "Grant Tycoon XP.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.xp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens booster",
+        "usage": "/gens booster <player> <sell|speed|xp> <percent> <minutes> [paid|free] [source] [txId]",
+        "description": "Grant a sell, speed or XP booster. Percent is 1-1000. Minutes are 1-43200.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.booster",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens event",
+        "usage": "/gens event start <event> [minutes] [txId] | /gens event stop",
+        "description": "Start or stop a server event. Minutes are 1-1440.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.event",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens vote",
+        "usage": "/gens vote <player>",
+        "description": "Record a vote for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.vote",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens audit",
+        "usage": "/gens audit <player> [limit]",
+        "description": "Show audited grants for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens crate",
+        "usage": "/gens crate set <mystery|monthly|captain> | /gens crate turn [mystery|monthly|captain] | /gens crate remove [mystery|monthly|captain]",
+        "description": "Place, turn or remove a crate at your feet.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens kai",
+        "usage": "/gens kai set | board | remove",
+        "description": "Place or remove Kai and the quest board.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens farm",
+        "usage": "/gens farm anvil [remove|clear] | /gens farm npc [remove] <farmer|fisherman|maris>",
+        "description": "Place the hoe-upgrader anvil or a spawn NPC.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens lootchest",
+        "usage": "/gens lootchest set|remove [boss]",
+        "description": "Place or remove a boss loot chest. Stand where it should go.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens network",
+        "usage": "/gens network | /gens send <player> <server>",
+        "description": "Show the network, or send a player to hub, skyblock or boss.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.network",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/pets give",
+        "usage": "/pets give <player> <type> [level]",
+        "description": "Give a pet. A reason or tx id is required by the grant log.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.pet.give",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mine",
+        "usage": "/mine pos1|pos2 | create <name> [layer] | setblocks <name> <block:%>... | settp <name> | requirement <name> pickaxeTier:<n> | reset <name> | delete <name> | list | ember | build | rush <name> | reload | pickaxe [player] | give <player> geodes <amount> | refund <player> coins|raw|crushed|ingot ... tx:<id>",
+        "description": "Deep Mines staff tools. Players use /mines, not /mine.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.mine",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/boss",
+        "usage": "/boss leave | /boss win [player] | /boss arena <boss> | /boss reset <player> [boss] | /boss top | /boss lb pending | /boss lb approve <week> | /boss lb setholo <server|remove>",
+        "description": "Boss staff actions. The admin list is gated by skyblockgens.admin. Players already have /boss leave and /boss top.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/warp set",
+        "usage": "/warp set <name> | /warp delete <name>",
+        "description": "Create or delete a server warp. /warp itself is a player command.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.warp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/hub set",
+        "usage": "/hub set | /hub reload | /hub statue | /hub tops | /hub board | /hub npc | /hub jumppad | /hub loot <boss>",
+        "description": "Place and reload hub spawn, statues, boards, NPCs and jump pads.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.build",
+        "servers": [
+          "hub"
+        ]
+      },
+      {
+        "command": "/island admin disband",
+        "usage": "/island admin disband <player|island>",
+        "description": "Disband another player's island permanently.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.disband",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin purge",
+        "usage": "/island admin purge <cancel|time>",
+        "description": "Purge inactive islands, or cancel a purge.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.purge",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin reload",
+        "usage": "/island admin reload",
+        "description": "Reload SuperiorSkyblock2.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.reload",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin resetworld",
+        "usage": "/island admin resetworld <player|island|*> <dimension>",
+        "description": "Reset one world of an island.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.resetworld",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin setleader",
+        "usage": "/island admin setleader <leader> <new-leader>",
+        "description": "Transfer an island to another member.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.setleader",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user info",
+        "usage": "/lp user <player> info",
+        "description": "Read a player's LuckPerms groups. You cannot open the web editor.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.info",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user parent add",
+        "usage": "/lp user <player> parent add <guide|mod>",
+        "description": "Add the Guide or Mod group. Adding Admin or Owner is denied.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.parent.add.guide",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user parent remove",
+        "usage": "/lp user <player> parent remove <guide|mod>",
+        "description": "Remove the Guide or Mod group. Removing Admin or Owner is denied.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.parent.remove.guide",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      }
+    ],
+    "owner": [
+      {
+        "command": "/duty",
+        "usage": "/duty",
+        "description": "Go on or off duty. The staff tag shows only while you are on duty. A player must run it. Other /staff actions refuse you until you are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.duty",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff chat",
+        "usage": "/staff chat <message>",
+        "description": "Message other staff who are on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.chat",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff warn",
+        "usage": "/staff warn <player> <reason>",
+        "description": "Record a warning on the player. This is the warning command. There is no /warn.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.warn",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff note",
+        "usage": "/staff note <player> <text>",
+        "description": "Add a staff note on a player. It does not punish them.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.note",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff mute",
+        "usage": "/staff mute <player> <time> <reason>",
+        "description": "Mute a player for any length.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.mute.unlimited",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff ban",
+        "usage": "/staff ban <player> <time> <reason>",
+        "description": "Ban a player, including a permanent ban.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.ban.permanent",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff history",
+        "usage": "/staff history <player>",
+        "description": "Show the staff notes, warns, mutes and bans recorded for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.history",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff lookup",
+        "usage": "/staff lookup <player>",
+        "description": "Show a player's warn count, mute and ban at a glance.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.lookup",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tp",
+        "usage": "/staff tp <player>",
+        "description": "Teleport yourself to an online player. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff tphere",
+        "usage": "/staff tphere <player>",
+        "description": "Bring an online player to you. You must be on duty. Same permission as /staff tp.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.tp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/whois",
+        "usage": "/whois <player>",
+        "description": "Show a player's UUID, ban, mute and last logout.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.whois",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mute",
+        "usage": "/mute <player> [time] [reason]",
+        "description": "Essentials mute with no config time cap. Prefer /staff mute so the punishment is recorded.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.mute",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/helpop",
+        "usage": "/helpop <message>",
+        "description": "Players can send this. Guide and above also have essentials.helpop.receive, so the message reaches you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.helpop.receive",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/plugins",
+        "usage": "/plugins",
+        "description": "List the plugins on this server.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.plugins",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/version",
+        "usage": "/version",
+        "description": "Show the server version.",
+        "plugin": "Paper",
+        "permission": "bukkit.command.version",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/report",
+        "usage": "/report",
+        "description": "Tells the player to open a Discord ticket. It does not file a report and it does not ping staff.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/seen",
+        "usage": "/seen <player>",
+        "description": "Last logout, ban, mute and UUID. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.seen",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/list",
+        "usage": "/list",
+        "description": "Who is online. Also granted to every player by Essentials player-commands.",
+        "plugin": "EssentialsX",
+        "permission": "minecraft.command.list",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/rules",
+        "usage": "/rules",
+        "description": "Show the server rules.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.command.rules",
+        "servers": [
+          "hub",
+          "skyblock"
+        ],
+        "also_for_players": true
+      },
+      {
+        "command": "/staff kick",
+        "usage": "/staff kick <player> <reason>",
+        "description": "Kick a player and record it. You must be on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.kick",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff vanish",
+        "usage": "/staff vanish",
+        "description": "Vanish yourself. Only a player can use it, and only while on duty.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.vanish",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff invsee",
+        "usage": "/staff invsee <player>",
+        "description": "Open a read-only copy of an online player's inventory.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.invsee",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/kick",
+        "usage": "/kick <player> [reason]",
+        "description": "Essentials kick. minecraft.command.kick is granted as well.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.kick",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tempban",
+        "usage": "/tempban <player> <time> [reason]",
+        "description": "Essentials temporary ban, including offline players. Config max-tempban-time is -1, so there is no 7-day cap on this command. Use /staff ban when the 7-day cap must hold.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tempban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/vanish",
+        "usage": "/vanish [player] [on|off]",
+        "description": "Essentials vanish. You can also see vanished staff (essentials.vanish.see).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.vanish",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/invsee",
+        "usage": "/invsee <player>",
+        "description": "Essentials inventory view. essentials.invsee.preventmodify is set, so the inventory cannot be edited.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.invsee",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/enderchest",
+        "usage": "/enderchest [player]",
+        "description": "Open your ender chest, or another player's (essentials.enderchest.others).",
+        "plugin": "EssentialsX",
+        "permission": "essentials.enderchest.others",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tp",
+        "usage": "/tp <player> [other]",
+        "description": "Essentials teleport. This is separate from /staff tp.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tp",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tphere",
+        "usage": "/tphere <player>",
+        "description": "Teleport a player to you.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.tphere",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/togglejail",
+        "usage": "/togglejail <player> <jail> [time]",
+        "description": "Send a player to a jail, or release them. A jail must already exist.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.togglejail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/setjail",
+        "usage": "/setjail <name>",
+        "description": "Create a jail where you are standing.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.setjail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/deljail",
+        "usage": "/deljail <name>",
+        "description": "Delete a jail. There is no /jail command.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.deljail",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin show",
+        "usage": "/island admin show [player|island]",
+        "description": "Show information about an island. Alias /is admin show.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.show",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin teleport",
+        "usage": "/island admin teleport <player|island> [dimension]",
+        "description": "Visit an island. Bypass mode is denied at this rank. Alias /is admin teleport.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.teleport",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff unmute",
+        "usage": "/staff unmute <player>",
+        "description": "Remove a staff mute.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.unmute",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff unban",
+        "usage": "/staff unban <player>",
+        "description": "Remove a staff ban.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.unban",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff refund",
+        "usage": "/staff refund <player> coins|keys <amount> tx:<id> <reason>",
+        "description": "Refund coins or keys once per transaction id. Gens, pets and ore use their own commands.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.refund",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/staff item",
+        "usage": "/staff item <player> <rod|fish|barrel|totem|pickaxe|gem|relic|hoe> ... <reason>",
+        "description": "Give a fishing, mining or quest item. Rods are 1-10. Hoes take a material and a level 1-5. Skyblock only.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.staff.item",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/ban",
+        "usage": "/ban <player> [reason]",
+        "description": "Essentials permanent ban, including offline players.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.ban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/unban",
+        "usage": "/unban <player>",
+        "description": "Essentials unban. minecraft.command.pardon is granted as well.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.unban",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens reload",
+        "usage": "/gens reload",
+        "description": "Reload SkyblockGens config, menus, scoreboard and warps.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.reload",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens give",
+        "usage": "/gens give <player> gen <tier> [amount] <reason> [txId] | collector <level> [amount] <reason> [txId] | wand <multiplier> <uses|unlimited> [amount] <reason> [txId] | gencore <I-VII|era> [amount] <reason> [txId] | hoe netherite <reason> [txId] | rod <1-10> [amount] <reason> [txId] | catalyst <3|5> [amount] <reason> [txId] | relic <locket|coin|chart> [amount] <reason> [txId]",
+        "description": "Give a gen, collector, wand, core, hoe, rod, catalyst or relic. A reason or tx id is required and the grant is audited.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.give",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens keys",
+        "usage": "/gens keys <player> [mystery|monthly] <1-1000> <reason> [txId]",
+        "description": "Grant mystery or monthly crate keys. A reason or tx id is required and the grant is audited.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.keys",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens store",
+        "usage": "/gens store <player> <rank> [txId]",
+        "description": "Set a player's store rank. Do not use this to fix a Tebex purchase by hand. Use /storeadmin.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.store",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens xp",
+        "usage": "/gens xp <player> <1-100000000>",
+        "description": "Grant Tycoon XP.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.xp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens booster",
+        "usage": "/gens booster <player> <sell|speed|xp> <percent> <minutes> [paid|free] [source] [txId]",
+        "description": "Grant a sell, speed or XP booster. Percent is 1-1000. Minutes are 1-43200.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.booster",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens event",
+        "usage": "/gens event start <event> [minutes] [txId] | /gens event stop",
+        "description": "Start or stop a server event. Minutes are 1-1440.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.event",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens vote",
+        "usage": "/gens vote <player>",
+        "description": "Record a vote for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.vote",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens audit",
+        "usage": "/gens audit <player> [limit]",
+        "description": "Show audited grants for a player.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens crate",
+        "usage": "/gens crate set <mystery|monthly|captain> | /gens crate turn [mystery|monthly|captain] | /gens crate remove [mystery|monthly|captain]",
+        "description": "Place, turn or remove a crate at your feet.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens kai",
+        "usage": "/gens kai set | board | remove",
+        "description": "Place or remove Kai and the quest board.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens farm",
+        "usage": "/gens farm anvil [remove|clear] | /gens farm npc [remove] <farmer|fisherman|maris>",
+        "description": "Place the hoe-upgrader anvil or a spawn NPC.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens lootchest",
+        "usage": "/gens lootchest set|remove [boss]",
+        "description": "Place or remove a boss loot chest. Stand where it should go.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.npc",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens network",
+        "usage": "/gens network | /gens send <player> <server>",
+        "description": "Show the network, or send a player to hub, skyblock or boss.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.network",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/pets give",
+        "usage": "/pets give <player> <type> [level]",
+        "description": "Give a pet. A reason or tx id is required by the grant log.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.pet.give",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mine",
+        "usage": "/mine pos1|pos2 | create <name> [layer] | setblocks <name> <block:%>... | settp <name> | requirement <name> pickaxeTier:<n> | reset <name> | delete <name> | list | ember | build | rush <name> | reload | pickaxe [player] | give <player> geodes <amount> | refund <player> coins|raw|crushed|ingot ... tx:<id>",
+        "description": "Deep Mines staff tools. Players use /mines, not /mine.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.mine",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/boss",
+        "usage": "/boss leave | /boss win [player] | /boss arena <boss> | /boss reset <player> [boss] | /boss top | /boss lb pending | /boss lb approve <week> | /boss lb setholo <server|remove>",
+        "description": "Boss staff actions. The admin list is gated by skyblockgens.admin. Players already have /boss leave and /boss top.",
+        "plugin": "SkyblockGens",
+        "permission": "skyblockgens.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/warp set",
+        "usage": "/warp set <name> | /warp delete <name>",
+        "description": "Create or delete a server warp. /warp itself is a player command.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.warp",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/hub set",
+        "usage": "/hub set | /hub reload | /hub statue | /hub tops | /hub board | /hub npc | /hub jumppad | /hub loot <boss>",
+        "description": "Place and reload hub spawn, statues, boards, NPCs and jump pads.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.build",
+        "servers": [
+          "hub"
+        ]
+      },
+      {
+        "command": "/island admin disband",
+        "usage": "/island admin disband <player|island>",
+        "description": "Disband another player's island permanently.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.disband",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin purge",
+        "usage": "/island admin purge <cancel|time>",
+        "description": "Purge inactive islands, or cancel a purge.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.purge",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin reload",
+        "usage": "/island admin reload",
+        "description": "Reload SuperiorSkyblock2.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.reload",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin resetworld",
+        "usage": "/island admin resetworld <player|island|*> <dimension>",
+        "description": "Reset one world of an island.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.resetworld",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin setleader",
+        "usage": "/island admin setleader <leader> <new-leader>",
+        "description": "Transfer an island to another member.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.setleader",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user info",
+        "usage": "/lp user <player> info",
+        "description": "Read a player's LuckPerms groups. You cannot open the web editor.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.info",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user parent add",
+        "usage": "/lp user <player> parent add <guide|mod>",
+        "description": "Add the Guide or Mod group. Adding Admin or Owner is denied.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.parent.add.guide",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp user parent remove",
+        "usage": "/lp user <player> parent remove <guide|mod>",
+        "description": "Remove the Guide or Mod group. Removing Admin or Owner is denied.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.user.parent.remove.guide",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gens wipe",
+        "usage": "/gens wipe <player> <reason>",
+        "description": "Wipe a player's gens data. The node tycoon.admin.wipe is not granted below Owner.",
+        "plugin": "SkyblockGens",
+        "permission": "tycoon.admin.wipe",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/storeadmin pending",
+        "usage": "/storeadmin pending",
+        "description": "List Tebex deliveries that are still waiting.",
+        "plugin": "SkyblockGensStore",
+        "permission": "skyblockgens.store.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/storeadmin retry",
+        "usage": "/storeadmin retry",
+        "description": "Try every pending delivery again.",
+        "plugin": "SkyblockGensStore",
+        "permission": "skyblockgens.store.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/storeadmin history",
+        "usage": "/storeadmin history <player>",
+        "description": "Show a player's Tebex deliveries. Use this before touching a purchase.",
+        "plugin": "SkyblockGensStore",
+        "permission": "skyblockgens.store.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/storeadmin redeliver",
+        "usage": "/storeadmin redeliver <transaction>",
+        "description": "Deliver one stored purchase again. Do not grant the same items by hand.",
+        "plugin": "SkyblockGensStore",
+        "permission": "skyblockgens.store.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/storeadmin revoke",
+        "usage": "/storeadmin revoke <transaction>",
+        "description": "Revoke one delivered purchase.",
+        "plugin": "SkyblockGensStore",
+        "permission": "skyblockgens.store.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expedition",
+        "usage": "/expedition",
+        "description": "Open Sky Expeditions. While access is staff, this needs tropicaltycoon.expedition.beta, which Owner has through *.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.beta",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin give",
+        "usage": "/expeditionadmin give <uuid> <name> <package> <qty> <transaction>",
+        "description": "Deliver one Sky Expeditions package for a Tebex transaction. Owner only.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin.give",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin pending",
+        "usage": "/expeditionadmin pending",
+        "description": "List Sky Expeditions purchases that are still stored.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin retry",
+        "usage": "/expeditionadmin retry",
+        "description": "Try pending Sky Expeditions deliveries again.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin info",
+        "usage": "/expeditionadmin info <player>",
+        "description": "Show a player's Sky Expeditions profile. The live command asks for a player.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin setlevel",
+        "usage": "/expeditionadmin setlevel <player> <value>",
+        "description": "Set a captain level. The server replies 'Name the player and the value.' when either is missing.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin addxp",
+        "usage": "/expeditionadmin addxp <player> <value>",
+        "description": "Add expedition XP. The server replies 'Name the player and the value.' when either is missing.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin givecoins",
+        "usage": "/expeditionadmin givecoins <player> <value>",
+        "description": "Add expedition coins. The server replies 'Name the player and the value.' when either is missing.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin finish",
+        "usage": "/expeditionadmin finish <player>",
+        "description": "Finish a voyage. Listed by the live command. It asks for an online player.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin reload",
+        "usage": "/expeditionadmin reload",
+        "description": "Reload Sky Expeditions.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/expeditionadmin economy",
+        "usage": "/expeditionadmin economy report [days] | /expeditionadmin economy export [days]",
+        "description": "Report or export the expedition economy. Tracking must be enabled.",
+        "plugin": "SkyblockGensExpedition",
+        "permission": "tropicaltycoon.expedition.admin",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/gamemode",
+        "usage": "/gamemode <survival|creative|adventure|spectator> [player]",
+        "description": "Change game mode. Denied for Admin. Allowed for Owner.",
+        "plugin": "EssentialsX",
+        "permission": "essentials.gamemode",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/op",
+        "usage": "/op <player>",
+        "description": "Operator a player. Denied below Owner.",
+        "plugin": "Minecraft",
+        "permission": "minecraft.command.op",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/deop",
+        "usage": "/deop <player>",
+        "description": "Remove operator. Denied below Owner.",
+        "plugin": "Minecraft",
+        "permission": "minecraft.command.deop",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/lp editor",
+        "usage": "/lp editor",
+        "description": "Open the LuckPerms web editor. Denied for Admin.",
+        "plugin": "LuckPerms",
+        "permission": "luckperms.editor",
+        "servers": [
+          "hub",
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/island admin bypass",
+        "usage": "/island admin bypass",
+        "description": "Toggle island bypass. Denied for Mod and Admin.",
+        "plugin": "SuperiorSkyblock2",
+        "permission": "superior.admin.bypass",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/tebex",
+        "usage": "/tebex",
+        "description": "Tebex plugin command (plugin.yml sets no permission, so it is op-level). Owner has *. Do not grant a purchase from here.",
+        "plugin": "Tebex",
+        "permission": "*",
+        "servers": [
+          "skyblock"
+        ]
+      },
+      {
+        "command": "/mining region",
+        "usage": "/mining region <kiln|molten_rush|vein_hunter|crystal_surge|heart_final|abyss_guardian>",
+        "description": "Register a mining region. skyblockgens.mining.admin is default op and is not granted below Owner.",
+        "plugin": "SkyblockGensMining",
+        "permission": "skyblockgens.mining.admin",
+        "servers": [
+          "skyblock"
+        ]
+      }
+    ]
+  },
+  "inheritance": {
+    "guide": [],
+    "mod": [
+      "guide"
+    ],
+    "admin": [
+      "mod"
+    ],
+    "owner": [
+      "admin"
+    ]
+  },
+  "weights": {
+    "guide": 100,
+    "mod": 200,
+    "admin": 300,
+    "owner": 1000
+  },
+  "track": "staff",
+  "other_groups": [
+    {
+      "name": "builder",
+      "weight": 60,
+      "track": null,
+      "note": "Not a staff rank and not on the staff track. Permissions: essentials.fly, superior.island.fly, weight.60."
+    },
+    {
+      "name": "admiral",
+      "weight": 60,
+      "track": "store"
+    },
+    {
+      "name": "mogul",
+      "weight": 50,
+      "track": "store"
+    },
+    {
+      "name": "tycoon",
+      "weight": 40,
+      "track": "store"
+    },
+    {
+      "name": "captain",
+      "weight": 30,
+      "track": "store"
+    },
+    {
+      "name": "surfer",
+      "weight": 20,
+      "track": "store"
+    },
+    {
+      "name": "islander",
+      "weight": 10,
+      "track": "store"
+    },
+    {
+      "name": "default",
+      "weight": 0,
+      "track": null
+    }
+  ],
+  "owner_wildcard": "Owner has * and luckperms.*. Every other command registered on the server is available to Owner and is not listed under Guide, Mod or Admin. That includes FastAsyncWorldEdit, the rest of /island admin, Vault, NuVotifier and the Tebex subcommands.",
+  "not_registered": [
+    {
+      "command": "/warn",
+      "note": "No root command. The real command is /staff warn."
+    },
+    {
+      "command": "/jail",
+      "note": "Not registered. Use /togglejail, /setjail and /deljail."
+    },
+    {
+      "command": "/co",
+      "note": "CoreProtect is not installed. LuckPerms still holds coreprotect.lookup and coreprotect.rollback nodes. They do nothing."
+    },
+    {
+      "command": "/gens bundle",
+      "note": "Not a subcommand of /gens on the live jar."
+    },
+    {
+      "command": "/givekeys",
+      "note": "Not a Minecraft command. Keys are /gens keys. /givekeys exists only as a Discord owner command."
+    },
+    {
+      "command": "/givexp",
+      "note": "Not a Minecraft command. XP is /gens xp. /givexp exists only as a Discord owner command."
+    },
+    {
+      "command": "/duty",
+      "server": "hub",
+      "note": "Unknown on the hub. It exists on skyblock."
+    },
+    {
+      "command": "/staff",
+      "server": "hub",
+      "note": "Unknown on the hub. It exists on skyblock."
+    },
+    {
+      "command": "/gens give",
+      "server": "hub",
+      "note": "Hub /gens only answers /gens network and /gens send."
+    }
+  ],
+  "luckperms": {
+    "guide": {
+      "bukkit.command.help": true,
+      "bukkit.command.plugins": true,
+      "bukkit.command.version": true,
+      "essentials.helpop": true,
+      "essentials.helpop.receive": true,
+      "essentials.mute": true,
+      "essentials.mute.notify": true,
+      "essentials.seen": true,
+      "essentials.whois": true,
+      "minecraft.command.list": true,
+      "tycoon.staff.ban.1d": true,
+      "tycoon.staff.chat": true,
+      "tycoon.staff.duty": true,
+      "tycoon.staff.history": true,
+      "tycoon.staff.lookup": true,
+      "tycoon.staff.mute.1d": true,
+      "tycoon.staff.note": true,
+      "tycoon.staff.tp": true,
+      "tycoon.staff.warn": true,
+      "weight.100": true
+    },
+    "mod": {
+      "coreprotect.inspect": true,
+      "coreprotect.lookup": true,
+      "coreprotect.restore": false,
+      "coreprotect.rollback": false,
+      "essentials.deljail": true,
+      "essentials.enderchest": true,
+      "essentials.enderchest.others": true,
+      "essentials.invsee": true,
+      "essentials.invsee.preventmodify": true,
+      "essentials.kick": true,
+      "essentials.kick.notify": true,
+      "essentials.mute.unlimited": true,
+      "essentials.setjail": true,
+      "essentials.silentjoin": true,
+      "essentials.silentquit": true,
+      "essentials.tempban": true,
+      "essentials.tempban.offline": true,
+      "essentials.togglejail": true,
+      "essentials.tp": true,
+      "essentials.tphere": true,
+      "essentials.vanish": true,
+      "essentials.vanish.see": true,
+      "minecraft.command.kick": true,
+      "skyblockgens.soulbound.bypass": true,
+      "superior.admin": true,
+      "superior.admin.bypass": false,
+      "superior.admin.show": true,
+      "superior.admin.teleport": true,
+      "tycoon.staff.ban.7d": true,
+      "tycoon.staff.invsee": true,
+      "tycoon.staff.kick": true,
+      "tycoon.staff.mute.7d": true,
+      "tycoon.staff.vanish": true,
+      "tycoon.staff.vanish.see": true,
+      "weight.200": true
+    },
+    "admin": {
+      "luckperms.*": false,
+      "coreprotect.restore": true,
+      "coreprotect.rollback": true,
+      "essentials.ban": true,
+      "essentials.ban.notify": true,
+      "essentials.ban.offline": true,
+      "essentials.gamemode": false,
+      "essentials.gamemode.all": false,
+      "essentials.gamemode.creative": false,
+      "essentials.tempban.unlimited": true,
+      "essentials.unban": true,
+      "luckperms.editor": false,
+      "luckperms.group.create": false,
+      "luckperms.group.delete": false,
+      "luckperms.user.info": true,
+      "luckperms.user.parent.add": true,
+      "luckperms.user.parent.add.admin": false,
+      "luckperms.user.parent.add.guide": true,
+      "luckperms.user.parent.add.mod": true,
+      "luckperms.user.parent.add.owner": false,
+      "luckperms.user.parent.remove": true,
+      "luckperms.user.parent.remove.admin": false,
+      "luckperms.user.parent.remove.guide": true,
+      "luckperms.user.parent.remove.mod": true,
+      "luckperms.user.parent.remove.owner": false,
+      "minecraft.command.ban": true,
+      "minecraft.command.deop": false,
+      "minecraft.command.gamemode": false,
+      "minecraft.command.op": false,
+      "minecraft.command.pardon": true,
+      "skyblockgens.admin": true,
+      "skyblockgens.pets.admin": true,
+      "superior.admin.disband": true,
+      "superior.admin.purge": true,
+      "superior.admin.reload": true,
+      "superior.admin.resetworld": true,
+      "superior.admin.setleader": true,
+      "tycoon.staff.ban.permanent": true,
+      "tycoon.staff.item": true,
+      "tycoon.staff.mute.unlimited": true,
+      "tycoon.staff.refund": true,
+      "tycoon.staff.unban": true,
+      "tycoon.staff.unmute": true,
+      "weight.300": true
+    },
+    "owner": {
+      "luckperms.*": true,
+      "*": true,
+      "coreprotect.restore": true,
+      "coreprotect.rollback": true,
+      "essentials.gamemode": true,
+      "essentials.gamemode.all": true,
+      "essentials.gamemode.creative": true,
+      "luckperms.editor": true,
+      "luckperms.group.create": true,
+      "luckperms.group.delete": true,
+      "luckperms.user.parent.add.admin": true,
+      "luckperms.user.parent.add.owner": true,
+      "luckperms.user.parent.remove.admin": true,
+      "luckperms.user.parent.remove.owner": true,
+      "minecraft.command.deop": true,
+      "minecraft.command.gamemode": true,
+      "minecraft.command.op": true,
+      "superior.admin.bypass": true,
+      "weight.1000": true
+    },
+    "builder": {
+      "essentials.fly": true,
+      "superior.island.fly": true,
+      "weight.60": true
+    }
+  },
+  "plugins": {
+    "proxy": {
+      "software": "Velocity 4.2.1-SNAPSHOT (git-5e641c65-b41)",
+      "runtime": [
+        "velocity",
+        "floodgate",
+        "geyser",
+        "geyserutils",
+        "nuvotifier"
+      ],
+      "jars": [
+        {
+          "name": "Geyser-Velocity",
+          "version": "2.12.1-b1276 (git-master-e963aec)",
+          "commands": []
+        },
+        {
+          "name": "floodgate",
+          "version": "2.2.5-SNAPSHOT (b141-81b65cc)",
+          "commands": []
+        },
+        {
+          "name": "GeyserUtils",
+          "version": "1.0.0",
+          "commands": []
+        },
+        {
+          "name": "NuVotifier",
+          "version": "3.3.6",
+          "commands": []
+        }
+      ]
+    },
+    "hub": {
+      "software": "Paper 26.2-133-ver/26.2@58e6e45 (API 26.2.build.133-stable)",
+      "runtime_count": 17,
+      "plugins": [
+        {
+          "name": "Essentials",
+          "version": "2.22.0",
+          "declared_commands": [
+            "afk",
+            "antioch",
+            "anvil",
+            "back",
+            "backup",
+            "balance",
+            "balancetop",
+            "ban",
+            "banip",
+            "beezooka",
+            "bigtree",
+            "book",
+            "bottom",
+            "break",
+            "broadcast",
+            "broadcastworld",
+            "burn",
+            "cartographytable",
+            "clearinventory",
+            "clearinventoryconfirmtoggle",
+            "compass",
+            "condense",
+            "createkit",
+            "customtext",
+            "delhome",
+            "deljail",
+            "delkit",
+            "delwarp",
+            "depth",
+            "disposal",
+            "eco",
+            "editsign",
+            "enchant",
+            "enderchest",
+            "essentials",
+            "exp",
+            "ext",
+            "feed",
+            "fireball",
+            "firework",
+            "fly",
+            "gamemode",
+            "gc",
+            "getpos",
+            "give",
+            "god",
+            "grindstone",
+            "hat",
+            "heal",
+            "help",
+            "helpop",
+            "home",
+            "ice",
+            "ignore",
+            "info",
+            "invsee",
+            "item",
+            "itemdb",
+            "itemlore",
+            "itemname",
+            "jailedplayers",
+            "jails",
+            "jump",
+            "kick",
+            "kickall",
+            "kill",
+            "kit",
+            "kitreset",
+            "kittycannon",
+            "lightning",
+            "list",
+            "loom",
+            "mail",
+            "me",
+            "more",
+            "motd",
+            "msg",
+            "msgtoggle",
+            "mute",
+            "near",
+            "nick",
+            "nuke",
+            "pay",
+            "payconfirmtoggle",
+            "paytoggle",
+            "ping",
+            "playtime",
+            "potion",
+            "powertool",
+            "powertoollist",
+            "powertooltoggle",
+            "ptime",
+            "pweather",
+            "r",
+            "realname",
+            "recipe",
+            "remove",
+            "renamehome",
+            "repair",
+            "rest",
+            "rtoggle",
+            "rules",
+            "seen",
+            "sell",
+            "sethome",
+            "setjail",
+            "settpr",
+            "setwarp",
+            "setworth",
+            "showkit",
+            "skull",
+            "smithingtable",
+            "socialspy",
+            "spawner",
+            "spawnmob",
+            "speed",
+            "stonecutter",
+            "sudo",
+            "suicide",
+            "tempban",
+            "tempbanip",
+            "thunder",
+            "time",
+            "togglejail",
+            "top",
+            "tp",
+            "tpa",
+            "tpaall",
+            "tpacancel",
+            "tpaccept",
+            "tpahere",
+            "tpall",
+            "tpauto",
+            "tpdeny",
+            "tphere",
+            "tpo",
+            "tpoffline",
+            "tpohere",
+            "tppos",
+            "tpr",
+            "tptoggle",
+            "tree",
+            "unban",
+            "unbanip",
+            "unlimited",
+            "vanish",
+            "warp",
+            "warpinfo",
+            "weather",
+            "whois",
+            "workbench",
+            "world",
+            "worth"
+          ]
+        },
+        {
+          "name": "FastAsyncWorldEdit",
+          "version": "2.16.1+9e5e49e",
+          "declared_commands": []
+        },
+        {
+          "name": "GeyserModelEngine",
+          "version": "1.0.9",
+          "declared_commands": []
+        },
+        {
+          "name": "LuckPerms",
+          "version": "5.5.71",
+          "declared_commands": [
+            "luckperms"
+          ]
+        },
+        {
+          "name": "ModelEngine",
+          "version": "R4.1.1",
+          "declared_commands": [
+            "meg"
+          ]
+        },
+        {
+          "name": "MythicMobs",
+          "version": "5.13.0-aad3f1c9",
+          "declared_commands": [
+            "addpin",
+            "mythicmobs",
+            "mythicmobsmenu",
+            "pins",
+            "spawnmob"
+          ]
+        },
+        {
+          "name": "PackHost",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGens",
+          "version": "0.1.0-SNAPSHOT",
+          "declared_commands": [
+            "ah",
+            "autosell",
+            "balance",
+            "baltop",
+            "boosters",
+            "boss",
+            "cosmetics",
+            "daily",
+            "dailyshop",
+            "fishdex",
+            "gemdex",
+            "gens",
+            "genshop",
+            "guide",
+            "hide",
+            "hub",
+            "keys",
+            "level",
+            "mine",
+            "mines",
+            "pay",
+            "pets",
+            "pond",
+            "prestige",
+            "pv",
+            "quests",
+            "ranks",
+            "rankup",
+            "report",
+            "rules",
+            "sell",
+            "shop",
+            "skills",
+            "skyblock",
+            "spawn",
+            "store",
+            "titles",
+            "tournaments",
+            "tpa",
+            "tpaccept",
+            "tpahere",
+            "tpdeny",
+            "trade",
+            "trash",
+            "value",
+            "vote",
+            "warp"
+          ]
+        },
+        {
+          "name": "SkyblockGensAcBoot",
+          "version": "1.3",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensBuy",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensFeedback",
+          "version": "1",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensLiveFix",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "Vault",
+          "version": "2.20.3",
+          "declared_commands": [
+            "vault-convert",
+            "vault-info"
+          ]
+        },
+        {
+          "name": "ViaBackwards",
+          "version": "5.12.1",
+          "declared_commands": []
+        },
+        {
+          "name": "ViaVersion",
+          "version": "5.12.1",
+          "declared_commands": [
+            "viaversion"
+          ]
+        },
+        {
+          "name": "floodgate",
+          "version": "2.2.5-SNAPSHOT (b141-81b65cc)",
+          "declared_commands": []
+        },
+        {
+          "name": "packetevents",
+          "version": "2.14.0",
+          "declared_commands": []
+        }
+      ]
+    },
+    "skyblock": {
+      "software": "Paper 26.3-175-main@bd9daa8 (API 26.3.build.175-stable)",
+      "runtime_count": 25,
+      "plugins": [
+        {
+          "name": "Essentials",
+          "version": "2.22.0",
+          "declared_commands": [
+            "afk",
+            "antioch",
+            "anvil",
+            "back",
+            "backup",
+            "balance",
+            "balancetop",
+            "ban",
+            "banip",
+            "beezooka",
+            "bigtree",
+            "book",
+            "bottom",
+            "break",
+            "broadcast",
+            "broadcastworld",
+            "burn",
+            "cartographytable",
+            "clearinventory",
+            "clearinventoryconfirmtoggle",
+            "compass",
+            "condense",
+            "createkit",
+            "customtext",
+            "delhome",
+            "deljail",
+            "delkit",
+            "delwarp",
+            "depth",
+            "disposal",
+            "eco",
+            "editsign",
+            "enchant",
+            "enderchest",
+            "essentials",
+            "exp",
+            "ext",
+            "feed",
+            "fireball",
+            "firework",
+            "fly",
+            "gamemode",
+            "gc",
+            "getpos",
+            "give",
+            "god",
+            "grindstone",
+            "hat",
+            "heal",
+            "help",
+            "helpop",
+            "home",
+            "ice",
+            "ignore",
+            "info",
+            "invsee",
+            "item",
+            "itemdb",
+            "itemlore",
+            "itemname",
+            "jailedplayers",
+            "jails",
+            "jump",
+            "kick",
+            "kickall",
+            "kill",
+            "kit",
+            "kitreset",
+            "kittycannon",
+            "lightning",
+            "list",
+            "loom",
+            "mail",
+            "me",
+            "more",
+            "motd",
+            "msg",
+            "msgtoggle",
+            "mute",
+            "near",
+            "nick",
+            "nuke",
+            "pay",
+            "payconfirmtoggle",
+            "paytoggle",
+            "ping",
+            "playtime",
+            "potion",
+            "powertool",
+            "powertoollist",
+            "powertooltoggle",
+            "ptime",
+            "pweather",
+            "r",
+            "realname",
+            "recipe",
+            "remove",
+            "renamehome",
+            "repair",
+            "rest",
+            "rtoggle",
+            "rules",
+            "seen",
+            "sell",
+            "sethome",
+            "setjail",
+            "settpr",
+            "setwarp",
+            "setworth",
+            "showkit",
+            "skull",
+            "smithingtable",
+            "socialspy",
+            "spawner",
+            "spawnmob",
+            "speed",
+            "stonecutter",
+            "sudo",
+            "suicide",
+            "tempban",
+            "tempbanip",
+            "thunder",
+            "time",
+            "togglejail",
+            "top",
+            "tp",
+            "tpa",
+            "tpaall",
+            "tpacancel",
+            "tpaccept",
+            "tpahere",
+            "tpall",
+            "tpauto",
+            "tpdeny",
+            "tphere",
+            "tpo",
+            "tpoffline",
+            "tpohere",
+            "tppos",
+            "tpr",
+            "tptoggle",
+            "tree",
+            "unban",
+            "unbanip",
+            "unlimited",
+            "vanish",
+            "warp",
+            "warpinfo",
+            "weather",
+            "whois",
+            "workbench",
+            "world",
+            "worth"
+          ]
+        },
+        {
+          "name": "FastAsyncWorldEdit",
+          "version": "2.16.1+9e5e49e",
+          "declared_commands": []
+        },
+        {
+          "name": "LuckPerms",
+          "version": "5.5.71",
+          "declared_commands": [
+            "luckperms"
+          ]
+        },
+        {
+          "name": "ModelEngine",
+          "version": "R4.1.1",
+          "declared_commands": [
+            "meg"
+          ]
+        },
+        {
+          "name": "PlaceholderAPI",
+          "version": "2.12.3",
+          "declared_commands": [
+            "placeholderapi"
+          ]
+        },
+        {
+          "name": "SkyblockGens",
+          "version": "0.1.0-SNAPSHOT",
+          "declared_commands": [
+            "ah",
+            "autosell",
+            "balance",
+            "baltop",
+            "boosters",
+            "boss",
+            "cosmetics",
+            "daily",
+            "dailyshop",
+            "duty",
+            "fishdex",
+            "gemdex",
+            "gems",
+            "gens",
+            "genshop",
+            "guide",
+            "hide",
+            "hub",
+            "keys",
+            "level",
+            "mine",
+            "mines",
+            "pay",
+            "pets",
+            "pond",
+            "prestige",
+            "pv",
+            "quests",
+            "ranks",
+            "rankup",
+            "report",
+            "rules",
+            "sell",
+            "shop",
+            "skills",
+            "skyblock",
+            "spawn",
+            "staff",
+            "store",
+            "titles",
+            "tournaments",
+            "tpa",
+            "tpaccept",
+            "tpahere",
+            "tpdeny",
+            "trade",
+            "trash",
+            "value",
+            "vote",
+            "warp"
+          ]
+        },
+        {
+          "name": "SkyblockGensAcBoot",
+          "version": "1.3",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensBuy",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensCoinflip",
+          "version": "0.1.0",
+          "declared_commands": [
+            "cf"
+          ]
+        },
+        {
+          "name": "SkyblockGensEarned",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensExpedition",
+          "version": "0.1.0",
+          "declared_commands": [
+            "expedition",
+            "expeditionadmin"
+          ]
+        },
+        {
+          "name": "SkyblockGensFeedback",
+          "version": "1",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensGeodeGrant",
+          "version": "1",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensItemFix",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensKrakenTitle",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensLiveFix",
+          "version": "0.1.0",
+          "declared_commands": []
+        },
+        {
+          "name": "SkyblockGensMining",
+          "version": "0.1.0",
+          "declared_commands": [
+            "mining"
+          ]
+        },
+        {
+          "name": "SkyblockGensStore",
+          "version": "0.1.0-SNAPSHOT",
+          "declared_commands": [
+            "storeadmin"
+          ]
+        },
+        {
+          "name": "SuperiorSkyblock2",
+          "version": "2026.3",
+          "declared_commands": []
+        },
+        {
+          "name": "Vault",
+          "version": "2.20.3",
+          "declared_commands": [
+            "vault-convert",
+            "vault-info"
+          ]
+        },
+        {
+          "name": "ViaBackwards",
+          "version": "5.12.1",
+          "declared_commands": []
+        },
+        {
+          "name": "ViaVersion",
+          "version": "5.12.1",
+          "declared_commands": [
+            "viaversion"
+          ]
+        },
+        {
+          "name": "floodgate",
+          "version": "2.2.5-SNAPSHOT (b141-81b65cc)",
+          "declared_commands": []
+        },
+        {
+          "name": "Votifier",
+          "version": "3.3.6",
+          "declared_commands": [
+            "nvreload",
+            "testvote"
+          ]
+        },
+        {
+          "name": "Tebex",
+          "version": "2.4.6",
+          "declared_commands": [
+            "tebex"
+          ]
+        }
+      ]
+    }
+  }
+}
