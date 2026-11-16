@@ -2,8 +2,8 @@
 
 Builds Guide / Mod / Admin rooms, a private channel with the owner for every
 staff member, and the staff handbook. The handbook follows the public rules in
-this bot and the in-game rank ladder (guide < mod < admin < owner): mute limits,
-tempban cap, and what admin is not allowed to do.
+this bot and the in-game rank ladder (guide < mod < admin < owner): a guide
+stops at 1 day, a mod at 7 days, and duty is required.
 
 Only runs on STAFF_GUILD_ID. Player-facing setup (/setupdiscord) is unchanged.
 """
@@ -69,13 +69,13 @@ STAFF_LAYOUT = (
     )),
     ("🛟 RANKS", (
         ("guide-chat", "Guides and up. Questions, shadowing, and cases inside a 1 hour mute.", "guide", "text"),
-        ("mod-chat", "Mods and up. Kicks, tempbans up to 7 days, and proof you are handing up.", "mod", "text"),
+        ("mod-chat", "Mods and up. Kicks, bans up to 7 days, and proof you are handing up.", "mod", "text"),
         ("admin-chat", "Admins and the owner. Permabans, item corrections, and rank changes.", "admin", "text"),
     )),
 )
 VENT_CATEGORY = "🫶 WITH THE OWNER"
 # Bumped when the handbook is rewritten, so an older post does not block the new one.
-DOC_VERSION = "v4"
+DOC_VERSION = "v5"
 VENT_MARKER = "vent=1"
 ROOM_FOR_RANK = {
     GUIDE_ROLE: "guide-chat",
@@ -266,7 +266,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "Your private channel has the rank you were given and where it stops. "
                      "Go on duty with `/duty` before any `/staff` action. "
                      "A guide stops at a **1 day** mute or ban. A mod stops at **7 days**. "
-                     "Permanent bans, refunds, and `/staff item` are admin. This server has no `/co` and no jail."),
+                     "Permanent bans, refunds, and `/staff item` are admin."),
                     ("3. Say hello, then watch",
                      f"Post in {chat} with your rank and the hours you are usually around. "
                      f"Read {guide} for a few real cases before you take one. "
@@ -353,8 +353,7 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "Kick. Mute and ban up to **7 days**, still only with `/staff mute` and `/staff ban`.\n"
                      "`/staff vanish` and `/staff invsee` (look, don't take). "
                      "`/island admin show` and `/island admin teleport` when nobody is on the island.\n"
-                     "You do **not** permaban, unmute, unban, refund, or `/staff item`. "
-                     "Essentials `/tp`, `/tphere`, `/mute`, and `/tempban` are not yours. There is no `/co` and no jail."),
+                     "A permanent ban, unmute, unban, a refund, or `/staff item` goes to admin."),
                     ("Admin",
                      "Permanent mute and ban. `/staff unmute` and `/staff unban`.\n"
                      "`/staff refund` and `/staff item`, with a reason. "
@@ -364,11 +363,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                     ("Owner",
                      "Creative, `/op`, LuckPerms, `/gens wipe`, the store and expedition tools, Tebex, `/hub set`, and `/warp set`.\n"
                      "Disbanding an island, purging it, or resetting the world stays here."),
-                    ("Blocked below owner",
-                     "A guide punishment longer than 1 day. A mod punishment longer than 7 days.\n"
-                     "Essentials mute, ban, kick, vanish, `/tp`, and `/tphere`. Those skip duty.\n"
-                     "Jail and `/co` are not on this server.\n"
-                     "Creative and other gamemodes. `/op` and LuckPerms past Guide and Mod."),
+                    ("Owner only",
+                     "Creative and other gamemodes, `/op`, and adding or removing Admin or Owner."),
                     ("Discord rooms follow the same ceiling",
                      f"Everyone reads {news}. Everyone talks in {chat} and joins {voice}.\n"
                      f"{guide} is the guide floor. {mod} is hidden from guides. {admin} is hidden from guides and mods.\n"
@@ -437,8 +433,8 @@ def handbook_sections(guild_name: str, icon_url: str | None = None, mentions: di
                      "First step is 7 days, which a mod may apply once the clip is real. 30 days and permanent are admin. "
                      "Vanish is for watching them. The clip is the proof. Then stop."),
                     ("Duping or exploiting",
-                     "There is no rollback command. A guide or mod saves the clip, the coords, and the time, and posts the note in admin chat. "
-                     "Admin takes the items off. Don't delete them yourself."),
+                     "A guide or mod saves the clip, the coords, and the time, and posts the note in admin chat. "
+                     "Admin takes the items off."),
                     ("Scam, theft, grief",
                      "A mod can do the 7 day step where the ladder starts there. A longer ban is admin. "
                      "Tell the player staff cannot always return a scam or a grief. Don't promise the items back."),
@@ -540,7 +536,7 @@ def rank_brief_embed(guild_name: str, icon_url: str | None, rank: str) -> discor
             "You are a Mod.",
             "You can kick, and mute or ban up to **7 days** with `/staff mute` and `/staff ban`. "
             "`/staff vanish`, `/staff tp`, `/staff tphere`, and read-only `/staff invsee` are yours. "
-            "Proof is a clip and the time. There is no `/co` and no jail.\n"
+            "Proof is a clip and the time.\n"
             "You cannot permaban, unmute, unban, or give items. Those go to admin with the case note already written.",
         ),
         ADMIN_ROLE: (
